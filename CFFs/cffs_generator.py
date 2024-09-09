@@ -34,17 +34,3 @@ class FiniteField:
                 result.append(1 if poly(x) == y else 0)
             results.append(result)
         return results
-
-    def display_results(self):
-        results = self.evaluate_polynomials()
-        for result in results:
-            print(result)
-
-# Usage of the class
-# q = pˆn
-p = 2
-n = 3
-# k == degree of the polynomials => k=2 => {0,1,2}
-k = 2
-field = FiniteField(p, n, k)
-field.display_results()
