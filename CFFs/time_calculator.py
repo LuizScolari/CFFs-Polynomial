@@ -3,15 +3,16 @@ import time
 import os
 from cffs_generator import FiniteField
 
-# Cases of test
+# List of test cases
 test_cases = [
     {'p': 2, 'n': 1, 'k': 1},
     {'p': 2, 'n': 1, 'k': 2},
+    {'p': 2, 'n': 2, 'k': 3},
     {'p': 2, 'n': 3, 'k': 2},
     {'p': 3, 'n': 2, 'k': 2},
 ]
 
-# The datas of the table
+# Dictionary to store the data
 datas = {
     'p': [],
     'n': [],
@@ -26,7 +27,7 @@ datas = {
 def calculate(p, n, k):
     field = FiniteField(p, n, k)
 
-    # Calculating the time of each function
+    # Measuring the time for each function
     start = time.time()
     elements = field._generate_elements()
     elements_time = time.time() - start
@@ -56,16 +57,20 @@ def calculate(p, n, k):
         'Total Time (s)': total_time
     }
 
-# Calculando os dados para cada caso de teste e armazenando
+# Calculating data for each test case and storing
 for case in test_cases:
     result = calculate(case['p'], case['n'], case['k'])
     for key in datas:
         datas[key].append(result[key])
 
-# Criando um DataFrame e salvando como um arquivo Excel
-df = pd.DataFrame(datas)
-file_path = 'test_cases_results.xlsx'
-df.to_excel(file_path, index=False)
+# Creating a directory called 'time_calculator_tables' if it does not exist
+output_dir = 'time_calculator_tables'
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
 
-# Abrindo o arquivo Excel automaticamente (somente no macOS)
-os.system(f'open {file_path}')
+# Path to the Excel file inside the 'time_calculator_tables' directory
+file_path = os.path.join(output_dir, 'test_cases_results.xlsx')
+
+# Creating a DataFrame and saving it as an Excel file
+df = pd.DataFrame(datas)
+df.to_excel(file_path, index=False)
