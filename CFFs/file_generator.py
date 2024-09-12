@@ -1,3 +1,4 @@
+from cffs_generator import FiniteField
 import os
 
 def generate_file(p, n, k, data_list, folder):
@@ -16,3 +17,13 @@ def generate_file(p, n, k, data_list, folder):
         for sublist in data_list:
             line = ' '.join(map(str, sublist))
             file.write(line + '\n')
+
+if __name__ == "__main__":
+    # Usage of the class
+    p = 3
+    n = 1
+    k = 1
+    field = FiniteField(p, n, k)
+    matrix = field.evaluate_polynomials()
+    folder = '../cffs_files'
+    generate_file(p, n, k, matrix, folder)
