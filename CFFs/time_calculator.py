@@ -7,9 +7,13 @@ from cffs_generator import FiniteField
 test_cases = [
     {'p': 2, 'n': 1, 'k': 1},
     {'p': 2, 'n': 1, 'k': 2},
+    {'p': 2, 'n': 2, 'k': 2},
     {'p': 2, 'n': 2, 'k': 3},
     {'p': 2, 'n': 3, 'k': 2},
     {'p': 3, 'n': 2, 'k': 2},
+    {'p': 3, 'n': 2, 'k': 2},
+    {'p': 3, 'n': 2, 'k': 3},
+    {'p': 3, 'n': 3, 'k': 2},
 ]
 
 # Dictionary to store the data
