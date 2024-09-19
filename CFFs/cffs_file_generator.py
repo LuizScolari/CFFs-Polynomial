@@ -20,10 +20,15 @@ def generate_file(p, n, k, data_list, folder):
 
 if __name__ == "__main__":
     # Usage of the class
-    p = 3
+    p = 5
     n = 1
     k = 1
     field = FiniteField(p, n, k)
     matrix = field.evaluate_polynomials()
-    folder = '../cffs_files'
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    
+    folder = os.path.join(parent_dir, 'cffs_files')
+    
     generate_file(p, n, k, matrix, folder)
