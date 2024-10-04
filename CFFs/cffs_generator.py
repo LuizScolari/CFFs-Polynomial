@@ -1,36 +1,53 @@
 import galois
 import itertools
 
-class FiniteField:
-    def __init__(self, p, n, k):
-        self.p = p
-        self.n = n
-        self.k = k
-        self.GF = galois.GF(p**n)
-        self.elements = self._generate_elements()
-        self.polynomials = self._generate_polynomials()
-        self.combinations = self._generate_combinations()
 
-    def _generate_elements(self):
-        self.GF.repr('poly')
-        elements = [e for e in self.GF.elements]
-        return elements
+def generate_elements(p, n):
+    GF = galois.GF(p**n)
+    GF.repr('poly')
+    elements = [e for e in GF.elements]
+    return elements, GF
+
+def generate_polynomials(GF1, GF2, k, crescimento):
+    if crescimento == "first":
+        polynomial_vectors = list(itertools.product(GF1.elements, repeat=k+1))
+        polynomials = [galois.Poly(vector, field=GF1) for vector in polynomial_vectors]
+    else:
+        elementos_GF1 = [int(x) for x in GF1.elements]
+        elementos_GF2_menos_GF1 = [x for x in GF2.elements if int(x) not in elementos_GF1] 
+
+        polynomials = []        
+        polynomial_vectors = list(itertools.product(*[elementos_GF1, elementos_GF2_menos_GF1], repeat=k))
+        [polynomials.append(galois.Poly(list(vector), field=GF2)) for vector in polynomial_vectors]
+        polynomial_vectors = list(itertools.product(*[elementos_GF2_menos_GF1, GF2.elements], repeat=k))
+        [polynomials.append(galois.Poly(list(vector), field=GF2)) for vector in polynomial_vectors]
+    return polynomials
+
+def generate_combinations(GF1, GF2, crescimento):
+    if crescimento == "first":
+        combinations = list(itertools.product(GF1.elements, repeat=2))
+    else: 
+        elementos_GF1 = [int(x) for x in GF1.elements]
+        elementos_GF2_menos_GF1 = [x for x in GF2.elements if int(x) not in elementos_GF1] 
+
+        combinations = []
+        comb1 = list(itertools.product(elementos_GF1, elementos_GF2_menos_GF1))
+        combinations.extend(comb1)
+        comb2 = list(itertools.product(elementos_GF2_menos_GF1, GF2.elements))
+        combinations.extend(comb2)
+    return combinations 
+
+
+def evaluate_polynomials(p, n, k, crescimento):
+    elements, GF = generate_elements(p, n)
+    polynomials = generate_polynomials(GF, k, crescimento)
+    combinations = generate_combinations(elements)
     
-    def _generate_polynomials(self):
-        polynomial_vectors = list(itertools.product(self.GF.elements, repeat=self.k+1))
-        polynomials = [galois.Poly(vector, field=self.GF) for vector in polynomial_vectors]
-        return polynomials
-
-    def _generate_combinations(self):
-        combinations = list(itertools.product(self.elements, repeat=2))
-        return combinations
-
-    def evaluate_polynomials(self):
-        results = []
-        for combination in self.combinations:
-            result = []
-            for poly in self.polynomials:
-                x, y = combination
-                result.append(1 if poly(x) == y else 0)
-            results.append(result)
-        return results
+    cff = []
+    for combination in combinations:
+        lines = []
+        for poly in polynomials:
+            x, y = combination
+        lines.append(1 if poly(x) == y else 0)
+        cff.append(lines)
+    return cff
