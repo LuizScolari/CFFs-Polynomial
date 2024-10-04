@@ -38,10 +38,10 @@ def generate_combinations(GF1, GF2, crescimento):
     return combinations 
 
 
-def evaluate_polynomials(p, n, k, crescimento):
-    elements, GF = generate_elements(p, n)
-    polynomials = generate_polynomials(GF, k, crescimento)
-    combinations = generate_combinations(elements)
+def evaluate_polynomials(GF1, GF2, p, n, k, crescimento):
+    elements = generate_elements(p, n)
+    polynomials = generate_polynomials(GF1, GF2, k, crescimento)
+    combinations = generate_combinations(GF1, GF2, crescimento)
     
     cff = []
     for combination in combinations:
