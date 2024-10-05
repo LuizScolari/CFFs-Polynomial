@@ -2,12 +2,6 @@ import galois
 import itertools
 
 
-def generate_elements(p, n):
-    GF = galois.GF(p**n)
-    GF.repr('poly')
-    elements = [e for e in GF.elements]
-    return elements, GF
-
 def generate_polynomials(GF1, GF2, k, crescimento):
     if crescimento == "first":
         polynomial_vectors = list(itertools.product(GF1.elements, repeat=k+1))
