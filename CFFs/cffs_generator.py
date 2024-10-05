@@ -16,11 +16,14 @@ def generate_polynomials(GF1, GF2, k, crescimento):
         elementos_GF1 = [int(x) for x in GF1.elements]
         elementos_GF2_menos_GF1 = [x for x in GF2.elements if int(x) not in elementos_GF1] 
 
-        polynomials = []        
+        polynomials_old_new = []
+        polynomials_new = []        
+        polynomial_vectors = list(itertools.product(*[elementos_GF1, elementos_GF1], repeat=k))
+        [polynomials_old_new.append(galois.Poly(list(vector), field=GF2)) for vector in polynomial_vectors]
         polynomial_vectors = list(itertools.product(*[elementos_GF1, elementos_GF2_menos_GF1], repeat=k))
-        [polynomials.append(galois.Poly(list(vector), field=GF2)) for vector in polynomial_vectors]
+        [polynomials_new.append(galois.Poly(list(vector), field=GF2)) for vector in polynomial_vectors]
         polynomial_vectors = list(itertools.product(*[elementos_GF2_menos_GF1, GF2.elements], repeat=k))
-        [polynomials.append(galois.Poly(list(vector), field=GF2)) for vector in polynomial_vectors]
+        [polynomials_new.append(galois.Poly(list(vector), field=GF2)) for vector in polynomial_vectors]
     return polynomials
 
 def generate_combinations(GF1, GF2, crescimento):
@@ -30,16 +33,18 @@ def generate_combinations(GF1, GF2, crescimento):
         elementos_GF1 = [int(x) for x in GF1.elements]
         elementos_GF2_menos_GF1 = [x for x in GF2.elements if int(x) not in elementos_GF1] 
 
-        combinations = []
+        combinations_old_new = []
+        combinations_new = []
+        comb0 = list(itertools.product(elementos_GF1, elementos_GF1))
+        combinations_old_new.extend(comb0)
         comb1 = list(itertools.product(elementos_GF1, elementos_GF2_menos_GF1))
-        combinations.extend(comb1)
+        combinations_new.extend(comb1)
         comb2 = list(itertools.product(elementos_GF2_menos_GF1, GF2.elements))
-        combinations.extend(comb2)
+        combinations_new.extend(comb2)
     return combinations 
 
 
-def evaluate_polynomials(GF1, GF2, p, n, k, crescimento):
-    elements = generate_elements(p, n)
+def evaluate_polynomials(GF1, GF2, k, crescimento):
     polynomials = generate_polynomials(GF1, GF2, k, crescimento)
     combinations = generate_combinations(GF1, GF2, crescimento)
     
