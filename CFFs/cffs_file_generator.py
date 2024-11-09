@@ -57,14 +57,15 @@ def generate_file(p, n, k, data_list, folder, growth, matrix_parts=None):
 
 if __name__ == "__main__":
     # Parâmetros
-    p = 5
-    n = 1
-    k = 2
-    growth = "first"  # Pode ser "first" ou "second"
+    p = 2
+    n = 2
+    k = 1
+    d = 1
+    growth = "second"  # Pode ser "first" ou "second"
 
-    GF1 = galois.GF(25)
+    GF1 = galois.GF(2)
     GF1.repr('poly')
-    GF2 = galois.GF(8)
+    GF2 = galois.GF(4)
     GF2.repr('poly')
 
     # Avalia os polinômios e gera a matriz
