@@ -8,7 +8,7 @@ def generate_polynomials(GF1, GF2, k, growth):
         polynomials = [galois.Poly(vector, field=GF1) for vector in polynomial_vectors]
         return polynomials
     else:
-        elementos_GF1 = [int(x) for x in GF1.elements]
+        elementos_GF1 = GF1.elements
         elementos_GF2_menos_GF1 = [x for x in GF2.elements if int(x) not in elementos_GF1] 
 
         polynomials_old = []
@@ -26,7 +26,7 @@ def generate_combinations(GF1, GF2, growth):
         combinations = list(itertools.product(GF1.elements, repeat=2))
         return combinations
     else: 
-        elementos_GF1 = [int(x) for x in GF1.elements]
+        elementos_GF1 = GF1.elements
         elementos_GF2_menos_GF1 = [x for x in GF2.elements if int(x) not in elementos_GF1] 
 
         combinations_old = []
@@ -38,7 +38,6 @@ def generate_combinations(GF1, GF2, growth):
         comb2 = list(itertools.product(elementos_GF2_menos_GF1, GF2.elements))
         combinations_new.extend(comb2)
         return combinations_old, combinations_new
-
 
 def evaluate_polynomials(GF1, GF2, k, growth):
     if growth == "first":
@@ -52,6 +51,7 @@ def evaluate_polynomials(GF1, GF2, k, growth):
                 lines.append(1 if poly(x) == y else 0)
             cff.append(lines)
         return cff
+    
     else:
         polynomials_old, polynomials_new = generate_polynomials(GF1, GF2, k, growth)
         combinations_old, combinations_new = generate_combinations(GF1, GF2, growth)
@@ -60,6 +60,8 @@ def evaluate_polynomials(GF1, GF2, k, growth):
             lines = []
             for poly in polynomials_new:
                 x, y = combination
+                x = GF2(x) 
+                y = GF2(y)
                 lines.append(1 if poly(x) == y else 0)
             cff_old_new.append(lines)
 
@@ -68,6 +70,8 @@ def evaluate_polynomials(GF1, GF2, k, growth):
             lines = []
             for poly in polynomials_old:
                 x, y = combination
+                x = GF2(x) 
+                y = GF2(y)
                 lines.append(1 if poly(x) == y else 0)
             cff_new_old.append(lines)
         
@@ -76,7 +80,8 @@ def evaluate_polynomials(GF1, GF2, k, growth):
             lines = []
             for poly in polynomials_new:
                 x, y = combination
+                x = GF2(x) 
+                y = GF2(y)
                 lines.append(1 if poly(x) == y else 0)
             cff_new.append(lines)
-            
         return cff_old_new, cff_new_old, cff_new
