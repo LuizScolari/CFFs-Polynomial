@@ -5,7 +5,7 @@ import itertools
 def generate_polynomials(GF1, GF2, k, growth):
     if growth == "first":
         polynomial_vectors = list(itertools.product(GF1.elements, repeat=k+1))
-        polynomials = [galois.Poly(vector, field=GF1) for vector in polynomial_vectors]
+        polynomials = [galois.Poly(vector, field=GF2) for vector in polynomial_vectors]  # Mudança: agora usamos GF2
         return polynomials
     else:
         elementos_GF1 = GF1.elements
@@ -48,6 +48,8 @@ def evaluate_polynomials(GF1, GF2, k, growth):
             lines = []
             for poly in polynomials:
                 x, y = combination
+                x = GF2(x)  
+                y = GF2(y) 
                 lines.append(1 if poly(x) == y else 0)
             cff.append(lines)
         return cff
@@ -85,3 +87,4 @@ def evaluate_polynomials(GF1, GF2, k, growth):
                 lines.append(1 if poly(x) == y else 0)
             cff_new.append(lines)
         return cff_old_new, cff_new_old, cff_new
+    
