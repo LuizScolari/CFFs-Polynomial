@@ -4,22 +4,53 @@ import itertools
 
 def generate_polynomials(GF1, GF2, k, growth):
     if growth == "first":
-        polynomial_vectors = list(itertools.product(GF1.elements, repeat=k+1))
-        polynomials = [galois.Poly(vector, field=GF1) for vector in polynomial_vectors]  
+        polynomial_vectors = list(itertools.product(GF1.elements, repeat=k))
+        polynomials = [galois.Poly(vector, field=GF1) for vector in polynomial_vectors]
         return polynomials
     else:
         elementos_GF1 = GF1.elements
-        elementos_GF2_menos_GF1 = [x for x in GF2.elements if int(x) not in elementos_GF1] 
+        elementos_GF2_menos_GF1 = [x for x in GF2.elements if int(x) not in elementos_GF1]
+        elementos_GF2 = GF2.elements
+
+        lists = [elementos_GF1, elementos_GF2_menos_GF1, elementos_GF2]
+
+        pattern = generate_patterns(k)
+
+        polynomials_new = []
+        for pat in pattern:
+            pools = [
+                lists[0] if j == 0 else lists[1] if j == 1 else lists[2]
+                for j in pat
+            ]
+            for vector in itertools.product(*pools):
+                polynomials_new.append(galois.Poly(list(vector), field=GF2))
 
         polynomials_old = []
-        polynomials_new = []        
-        polynomial_vectors = list(itertools.product(*[elementos_GF1, elementos_GF1], repeat=k))
-        [polynomials_old.append(galois.Poly(list(vector), field=GF2)) for vector in polynomial_vectors]
-        polynomial_vectors = list(itertools.product(*[elementos_GF1, elementos_GF2_menos_GF1], repeat=k))
-        [polynomials_new.append(galois.Poly(list(vector), field=GF2)) for vector in polynomial_vectors]
-        polynomial_vectors = list(itertools.product(*[elementos_GF2_menos_GF1, GF2.elements], repeat=k))
-        [polynomials_new.append(galois.Poly(list(vector), field=GF2)) for vector in polynomial_vectors]
+        polynomial_vectors = list(itertools.product(elementos_GF1, repeat=k))
+        for vector in polynomial_vectors:
+            polynomials_old.append(galois.Poly(list(vector), field=GF2))
+        
+        for poly in polynomials_old:
+            print(poly)
+
         return polynomials_old, polynomials_new
+
+def generate_patterns(k):
+    a = k
+    pattern = []
+
+    for i in range(k+1):
+        pat = []
+        for j in range(k+1):
+            if(j<a):
+                pat.append(0)
+            elif (j==a):
+                pat.append(1)
+            else:
+                pat.append(2)
+        a -= 1
+        pattern.append(pat)
+    return pattern
 
 def generate_combinations(GF1, GF2, growth):
     if growth == "first":
@@ -84,5 +115,5 @@ def evaluate_polynomials(GF1, GF2, k, growth):
                 y = GF2(y)
                 lines.append(1 if poly(x) == y else 0)
             cff_new.append(lines)
+
         return cff_old_new, cff_new_old, cff_new
-    
