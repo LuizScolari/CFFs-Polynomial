@@ -57,23 +57,23 @@ def generate_file(p, n, k, data_list, folder, growth, matrix_parts=None):
 
 if __name__ == "__main__":
     # Parâmetros
-    p = 2
+    p = 3
     n = 2
-    k = 1
+    k = 2
     d = 1
     growth = "second"  # Pode ser "first" ou "second"
 
-    GF1 = galois.GF(2)
+    GF1 = galois.GF(3)
     GF1.repr('poly')
-    GF2 = galois.GF(4)
+    GF2 = galois.GF(9)
     GF2.repr('poly')
 
     # Avalia os polinômios e gera a matriz
     if growth == "first":
-        matrix = evaluate_polynomials(GF1, GF2, 1, growth)
+        matrix = evaluate_polynomials(GF1, GF2, k, growth)
         matrix_parts = None  # Não precisa de partes diferentes no modo 'first'
     else:
-        matrix_parts = evaluate_polynomials(GF1, GF2, 1, growth)
+        matrix_parts = evaluate_polynomials(GF1, GF2, k, growth)
 
     # Define o diretório e o arquivo
     script_dir = os.path.dirname(os.path.abspath(__file__))
