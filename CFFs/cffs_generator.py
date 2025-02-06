@@ -7,23 +7,23 @@ def generate_polynomials(GF1, GF2, k, growth, old_k):
         polynomials = [galois.Poly(vector, field=GF1) for vector in polynomial_vectors]
         return polynomials
     else:
-        elementos_GF1 = GF1.elements
-        elementos_GF2_menos_GF1 = [x for x in GF2.elements if int(x) not in elementos_GF1]
-        elementos_GF2 = GF2.elements
+        elements_GF1 = GF1.elements
+        elements_GF2_less_GF1 = [x for x in GF2.elements if int(x) not in elements_GF1]
+        elements_GF2 = GF2.elements
 
         polynomials_new = []
         polynomials_old = []
 
-        lists = [elementos_GF1, elementos_GF2_menos_GF1, elementos_GF2]
+        lists = [elements_GF1, elements_GF2_less_GF1, elements_GF2]
 
         if old_k != k:
             spec_line = generate_special_line(k)
-            elemento_GF1_s0 = [x for x in GF1.elements if int(x) != 0]
+            element_GF1_s0 = [x for x in GF1.elements if int(x) != 0]
 
-            pools = [elemento_GF1_s0]
+            pools = [element_GF1_s0]
 
             for i in range(len(spec_line)-1):
-                pools.append(elementos_GF1)
+                pools.append(elements_GF1)
 
             for vector in itertools.product(*pools):
                 polynomials_new.append(galois.Poly(list(vector), field=GF2))
@@ -39,11 +39,11 @@ def generate_polynomials(GF1, GF2, k, growth, old_k):
                 polynomials_new.append(galois.Poly(list(vector), field=GF2))
 
         if old_k != k:
-            polynomial_vectors = list(itertools.product(elementos_GF1, repeat=old_k+1))
+            polynomial_vectors = list(itertools.product(elements_GF1, repeat=old_k+1))
             for vector in polynomial_vectors:
                 polynomials_old.append(galois.Poly(list(vector), field=GF2))
         else:
-            polynomial_vectors = list(itertools.product(elementos_GF1, repeat=k+1))
+            polynomial_vectors = list(itertools.product(elements_GF1, repeat=k+1))
             for vector in polynomial_vectors:
                 polynomials_old.append(galois.Poly(list(vector), field=GF2))
 
@@ -77,16 +77,16 @@ def generate_combinations(GF1, GF2, growth):
         combinations = list(itertools.product(GF1.elements, repeat=2))
         return combinations
     else: 
-        elementos_GF1 = GF1.elements
-        elementos_GF2_menos_GF1 = [x for x in GF2.elements if int(x) not in elementos_GF1] 
+        elements_GF1 = GF1.elements
+        elements_GF2_less_GF1 = [x for x in GF2.elements if int(x) not in elements_GF1] 
 
         combinations_old = []
         combinations_new = []
-        comb0 = list(itertools.product(elementos_GF1, elementos_GF1))
+        comb0 = list(itertools.product(elements_GF1, elements_GF1))
         combinations_old.extend(comb0)
-        comb1 = list(itertools.product(elementos_GF1, elementos_GF2_menos_GF1))
+        comb1 = list(itertools.product(elements_GF1, elements_GF2_less_GF1))
         combinations_new.extend(comb1)
-        comb2 = list(itertools.product(elementos_GF2_menos_GF1, GF2.elements))
+        comb2 = list(itertools.product(elements_GF2_less_GF1, GF2.elements))
         combinations_new.extend(comb2)
         return combinations_old, combinations_new
 
