@@ -18,6 +18,10 @@ def generate_file(GF1, GF2, k, old_k, data_list, folder, growth, matrix_parts=No
         columns = GF1_size ** (k + 1)
         lines = GF1_size ** 2
         d = int((GF1_size - 1) / k)
+
+        if d > (GF1_size-1)/k:
+            print("Condição d <= (q-1)/k não satisfeita")
+            return
     else: 
         columns = GF1_size ** (old_k + 1)
         lines = GF1_size ** 2
@@ -40,6 +44,10 @@ def generate_file(GF1, GF2, k, old_k, data_list, folder, growth, matrix_parts=No
         new_columns = GF2_size ** (k + 1)
         new_lines = GF2_size ** 2
         new_d = int((GF2_size - 1) / k)
+
+        if  new_d > (GF2_size-1)/k:
+            print("Condição d <= (q-1)/k não satisfeita")
+            return
 
         new_name = f"{new_d}-CFF({new_lines},{new_columns}).txt"
         new_path = os.path.join(folder, new_name)
