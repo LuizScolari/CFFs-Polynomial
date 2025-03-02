@@ -9,11 +9,20 @@ def combine_matrices(existing_matrix, cff_old_new, cff_new_old, cff_new):
     combined_matrix = combined_top + combined_bottom
     return combined_matrix
 
-def validate_condition(GF_size, k):
-    """Validates the condition to ensure that d is not zero."""
-    d = (GF_size - 1) // k
+def validate_condition(GF1, GF2, k, old_k):
+    """Validates the conditions."""
+    if GF2 == None:
+        d = (GF1.order - 1) // k
+    else:
+        d = (GF2.order - 1) // k
     if d == 0:
         print("CFF inválida d=0")
+        return False
+    if GF1 > GF2 and GF2 != None:
+        print("O corpo finito deve ser maior ou igual")
+        return False
+    if old_k > k and old_k != None:
+        print("O grau do polinômio não deve diminuir")
         return False
     return True
 
@@ -27,15 +36,13 @@ def file_name(GF_size, k):
 
 def write_on_file(data_list, GF_size, k):
     """Writes the matrix data to a file."""
-    condition = validate_condition(GF_size.order, k)
-    if condition == True:
-        filename = file_name(GF_size.order, k)
-        folder = determine_folder()
-        folder_path = os.path.join(folder, filename)
-        with open(folder_path, 'w') as file:
-                for sublist in data_list:
-                    line = ' '.join(map(str, sublist))
-                    file.write(line + '\n')
+    filename = file_name(GF_size.order, k)
+    folder = determine_folder()
+    folder_path = os.path.join(folder, filename)
+    with open(folder_path, 'w') as file:
+        for sublist in data_list:
+            line = ' '.join(map(str, sublist))
+            file.write(line + '\n')
 
 def  handle_growth_case(GF1, GF2, k, old_k, matrix_parts):
     """Handles the growth case by renaming and updating files."""
@@ -86,8 +93,10 @@ def create_matrix(GF1, k):
     GF1 = galois.GF(GF1)
     GF1.repr('poly')
 
-    matrix = evaluate_polynomials(GF1, None, k, None)
-    generate_file(GF1, None, k, None, matrix)
+    condition = validate_condition(GF1, None, k, None)
+    if condition == True:
+        matrix = evaluate_polynomials(GF1, None, k, None)
+        generate_file(GF1, None, k, None, matrix)
 
 def grow_matrix(GF1, GF2, k, old_k):
     """Expands an existing matrix to a new finite field and updates the corresponding file."""
@@ -96,5 +105,7 @@ def grow_matrix(GF1, GF2, k, old_k):
     GF2 = galois.GF(GF2)
     GF2.repr('poly')
 
-    matrix_parts = evaluate_polynomials(GF1, GF2, k, old_k)
-    generate_file(GF1, GF2, k, old_k, None, matrix_parts=matrix_parts)
+    condition = validate_condition(GF1, GF2, k, old_k)
+    if condition == True:
+        matrix_parts = evaluate_polynomials(GF1, GF2, k, old_k)
+        generate_file(GF1, GF2, k, old_k, None, matrix_parts=matrix_parts)
