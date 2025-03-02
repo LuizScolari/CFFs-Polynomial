@@ -18,12 +18,14 @@ def validate_condition(GF1, GF2, k, old_k):
     if d == 0:
         print("CFF inválida d=0")
         return False
-    if GF1 > GF2 and GF2 != None:
-        print("O corpo finito deve ser maior ou igual")
-        return False
-    if old_k > k and old_k != None:
-        print("O grau do polinômio não deve diminuir")
-        return False
+    if GF2 != None:
+        if GF1.order > GF2.order:
+            print("O corpo finito deve ser maior ou igual")
+            return False
+    if  old_k != None:
+        if old_k > k:
+            print("O grau do polinômio não deve diminuir")
+            return False
     return True
 
 def file_name(GF_size, k):
@@ -109,3 +111,6 @@ def grow_matrix(GF1, GF2, k, old_k):
     if condition == True:
         matrix_parts = evaluate_polynomials(GF1, GF2, k, old_k)
         generate_file(GF1, GF2, k, old_k, None, matrix_parts=matrix_parts)
+
+create_matrix(2,1)
+grow_matrix(2,4,1,1)
