@@ -10,8 +10,8 @@ def combine_matrices(existing_matrix, cff_old_new, cff_new_old, cff_new):
 
 def validate_condition(GF_size, k):
     d = (GF_size - 1) // k
-    if d > (GF_size-1)/k:
-        print("Condição d <= (q-1)/k não satisfeita")
+    if d == 0:
+        print("CFF inválida d=0")
         return False
     return True
 
@@ -23,13 +23,15 @@ def file_name(GF_size, k):
     return filename
 
 def write_on_file(data_list, GF_size, k):
-    filename = file_name(GF_size.order, k)
-    folder = determine_folder()
-    folder_path = os.path.join(folder, filename)
-    with open(folder_path, 'w') as file:
-            for sublist in data_list:
-                line = ' '.join(map(str, sublist))
-                file.write(line + '\n')
+    condition = validate_condition(GF_size.order, k)
+    if condition == True:
+        filename = file_name(GF_size.order, k)
+        folder = determine_folder()
+        folder_path = os.path.join(folder, filename)
+        with open(folder_path, 'w') as file:
+                for sublist in data_list:
+                    line = ' '.join(map(str, sublist))
+                    file.write(line + '\n')
 
 def  handle_growth_case(GF1, GF2, k, old_k, matrix_parts):
     filename = file_name(GF1.order, old_k)
@@ -87,6 +89,3 @@ def grow_matrix(GF1, GF2, k, old_k):
 
     matrix_parts = evaluate_polynomials(GF1, GF2, k, old_k)
     generate_file(GF1, GF2, k, old_k, None, matrix_parts=matrix_parts)
-
-create_matrix(2,1)
-grow_matrix(2,4,2,1)
