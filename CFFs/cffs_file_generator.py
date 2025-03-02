@@ -61,28 +61,28 @@ def determine_folder():
     folder = os.path.join(parent_dir, 'growth_cffs')
     return folder
 
-def generate_file(GF1, GF2, k, old_k, data_list, growth, matrix_parts=None):
+def generate_file(GF1, GF2, k, old_k, data_list, matrix_parts=None):
     folder = determine_folder()
 
     if not os.path.exists(folder):
         os.makedirs(folder)
 
-    if growth == "first":
+    if GF2 == None:
         write_on_file(data_list, GF1, k)
     else:
         handle_growth_case(GF1, GF2, k, old_k, matrix_parts)
 
-def create_matrix(GF1, GF2, actual_k, growth, old_k):
+def create_matrix(GF1, GF2, actual_k, old_k):
     GF1 = galois.GF(GF1)
     GF1.repr('poly')
     GF2 = galois.GF(GF2)
     GF2.repr('poly')
 
-    if growth == "first":
-        matrix = evaluate_polynomials(GF1, GF2, actual_k, growth, old_k)
-        generate_file(GF1, GF2, actual_k, None, matrix, growth)
+    if GF2 == None:
+        matrix = evaluate_polynomials(GF1, GF2, actual_k, old_k)
+        generate_file(GF1, GF2, actual_k, None, matrix)
     else:
-        matrix_parts = evaluate_polynomials(GF1, GF2, actual_k, growth, old_k)
-        generate_file(GF1, GF2, actual_k, old_k, None, growth, matrix_parts=matrix_parts)
+        matrix_parts = evaluate_polynomials(GF1, GF2, actual_k, old_k)
+        generate_file(GF1, GF2, actual_k, old_k, None, matrix_parts=matrix_parts)
 
 create_matrix(2, 4, 2, 1)
