@@ -85,4 +85,4 @@ def create_matrix(GF1, GF2, actual_k, growth, old_k):
         matrix_parts = evaluate_polynomials(GF1, GF2, actual_k, growth, old_k)
         generate_file(GF1, GF2, actual_k, old_k, None, growth, matrix_parts=matrix_parts)
 
-create_matrix(2, 4, 2, "second", 1)
+create_matrix(2, 4, 2, 1)

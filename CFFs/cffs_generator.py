@@ -1,8 +1,8 @@
 import galois
 import itertools
 
-def generate_polynomials(GF1, GF2, k, growth, old_k):
-    if growth == "first":
+def generate_polynomials(GF1, GF2, k, old_k):
+    if GF2 == None and old_k == None:
         polynomial_vectors = list(itertools.product(GF1.elements, repeat=k+1))
         polynomials = [galois.Poly(vector, field=GF1) for vector in polynomial_vectors]
         return polynomials
@@ -72,8 +72,8 @@ def generate_special_line(k):
         pattern.append(1)
     return pattern
 
-def generate_combinations(GF1, GF2, growth):
-    if growth == "first":
+def generate_combinations(GF1, GF2):
+    if GF2 == None:
         combinations = list(itertools.product(GF1.elements, repeat=2))
         return combinations
     else: 
@@ -90,10 +90,10 @@ def generate_combinations(GF1, GF2, growth):
         combinations_new.extend(comb2)
         return combinations_old, combinations_new
 
-def evaluate_polynomials(GF1, GF2, k, growth, old_k):
-    if growth == "first":
-        polynomials = generate_polynomials(GF1, GF2, k, growth, old_k)
-        combinations = generate_combinations(GF1, GF2, growth)
+def evaluate_polynomials(GF1, GF2, k, old_k):
+    if GF2 == None and old_k == None:
+        polynomials = generate_polynomials(GF1, GF2, k, old_k)
+        combinations = generate_combinations(GF1, GF2)
         cff = []
         for combination in combinations:
             lines = []
@@ -104,8 +104,8 @@ def evaluate_polynomials(GF1, GF2, k, growth, old_k):
         return cff
     
     else:
-        polynomials_old, polynomials_new = generate_polynomials(GF1, GF2, k, growth, old_k)
-        combinations_old, combinations_new = generate_combinations(GF1, GF2, growth)
+        polynomials_old, polynomials_new = generate_polynomials(GF1, GF2, k, old_k)
+        combinations_old, combinations_new = generate_combinations(GF1, GF2)
         cff_old_new = []
         for combination in combinations_old:
             lines = []
