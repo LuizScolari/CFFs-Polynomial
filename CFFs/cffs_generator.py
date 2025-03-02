@@ -37,15 +37,15 @@ def generate_polynomials(GF1, GF2, k, old_k):
             ]
             for vector in itertools.product(*pools):
                 polynomials_new.append(galois.Poly(list(vector), field=GF2))
-
-        if old_k != k:
-            polynomial_vectors = list(itertools.product(elements_GF1, repeat=old_k+1))
-            for vector in polynomial_vectors:
-                polynomials_old.append(galois.Poly(list(vector), field=GF2))
-        else:
-            polynomial_vectors = list(itertools.product(elements_GF1, repeat=k+1))
-            for vector in polynomial_vectors:
-                polynomials_old.append(galois.Poly(list(vector), field=GF2))
+        if GF1 != GF2:
+            if old_k != k:
+                polynomial_vectors = list(itertools.product(elements_GF1, repeat=old_k+1))
+                for vector in polynomial_vectors:
+                    polynomials_old.append(galois.Poly(list(vector), field=GF2))
+            else:
+                polynomial_vectors = list(itertools.product(elements_GF1, repeat=k+1))
+                for vector in polynomial_vectors:
+                    polynomials_old.append(galois.Poly(list(vector), field=GF2))
 
         return polynomials_old, polynomials_new
 
@@ -84,10 +84,11 @@ def generate_combinations(GF1, GF2):
         combinations_new = []
         comb0 = list(itertools.product(elements_GF1, elements_GF1))
         combinations_old.extend(comb0)
-        comb1 = list(itertools.product(elements_GF1, elements_GF2_less_GF1))
-        combinations_new.extend(comb1)
-        comb2 = list(itertools.product(elements_GF2_less_GF1, GF2.elements))
-        combinations_new.extend(comb2)
+        if GF1 != GF2:
+            comb1 = list(itertools.product(elements_GF1, elements_GF2_less_GF1))
+            combinations_new.extend(comb1)
+            comb2 = list(itertools.product(elements_GF2_less_GF1, GF2.elements))
+            combinations_new.extend(comb2)
         return combinations_old, combinations_new
 
 def evaluate_polynomials(GF1, GF2, k, old_k):
