@@ -18,49 +18,38 @@ def generate_polynomials(GF1, GF2, k, old_k):
         lists = [elements_GF1, elements_GF2_less_GF1, elements_GF2]
 
         if old_k != k:
-            spec_line = [0]
-            for i in range(k):
-                spec_line.append(1)
-
             element_GF1_s0 = [x for x in GF1.elements if int(x) != 0]
 
-            pools = [element_GF1_s0]
-
-            for i in range(len(spec_line)-1):
-                pools.append(elements_GF1)
+            pools = [element_GF1_s0] + [elements_GF1] * k
 
             for vector in itertools.product(*pools):
                 polynomials_new.append(galois.Poly(list(vector), field=GF2))
 
-        pattern = []
-        for i in range(k+1):
-            pat = []
-            for j in range(k+1):
-                if(j<a):
-                    pat.append(0)
-                elif (j==a):
-                    pat.append(1)
-                else:
-                    pat.append(2)
-            a -= 1
-            pattern.append(pat)
-
-        for pat in pattern:
-            pools = [
-                lists[0] if j == 0 else lists[1] if j == 1 else lists[2]
-                for j in pat
-            ]
-            for vector in itertools.product(*pools):
-                polynomials_new.append(galois.Poly(list(vector), field=GF2))
         if GF1 != GF2:
-            if old_k != k:
-                polynomial_vectors = list(itertools.product(elements_GF1, repeat=old_k+1))
-                for vector in polynomial_vectors:
-                    polynomials_old.append(galois.Poly(list(vector), field=GF2))
-            else:
-                polynomial_vectors = list(itertools.product(elements_GF1, repeat=k+1))
-                for vector in polynomial_vectors:
-                    polynomials_old.append(galois.Poly(list(vector), field=GF2))
+            a = k
+            pattern = []
+            for i in range(k+1):
+                pat = []
+                for j in range(k+1):
+                    if(j<a):
+                        pat.append(0)
+                    elif (j==a):
+                        pat.append(1)
+                    else:
+                        pat.append(2)
+                a -= 1
+                pattern.append(pat)
+
+            for pat in pattern:
+                pools = [lists[j] for j in pat]
+
+                for vector in itertools.product(*pools):
+                    polynomials_new.append(galois.Poly(list(vector), field=GF2))
+
+        
+            polynomial_vectors = list(itertools.product(elements_GF1, repeat=(old_k if old_k != k else k)+1))
+            for vector in polynomial_vectors:
+                polynomials_old.append(galois.Poly(list(vector), field=GF2))
 
         return polynomials_old, polynomials_new
 
