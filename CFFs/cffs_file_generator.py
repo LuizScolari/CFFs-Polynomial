@@ -3,12 +3,14 @@ import os
 import galois
 
 def combine_matrices(existing_matrix, cff_old_new, cff_new_old, cff_new):
+    """Combines existing matrices with new parts to create an expanded matrix."""
     combined_top = [existing_row + old_new_row for existing_row, old_new_row in zip(existing_matrix, cff_old_new)]
     combined_bottom = [new_old_row + new_row for new_old_row, new_row in zip(cff_new_old, cff_new)]
     combined_matrix = combined_top + combined_bottom
     return combined_matrix
 
 def validate_condition(GF_size, k):
+    """Validates the condition to ensure that d is not zero."""
     d = (GF_size - 1) // k
     if d == 0:
         print("CFF inválida d=0")
@@ -16,6 +18,7 @@ def validate_condition(GF_size, k):
     return True
 
 def file_name(GF_size, k):
+    """Generates the file name based on the finite field size and parameter k."""
     columns = GF_size ** (k + 1)
     lines = GF_size ** 2
     d = int((GF_size - 1) / k)
@@ -23,6 +26,7 @@ def file_name(GF_size, k):
     return filename
 
 def write_on_file(data_list, GF_size, k):
+    """Writes the matrix data to a file."""
     condition = validate_condition(GF_size.order, k)
     if condition == True:
         filename = file_name(GF_size.order, k)
@@ -34,6 +38,7 @@ def write_on_file(data_list, GF_size, k):
                     file.write(line + '\n')
 
 def  handle_growth_case(GF1, GF2, k, old_k, matrix_parts):
+    """Handles the growth case by renaming and updating files."""
     filename = file_name(GF1.order, old_k)
     new_filename = file_name(GF2.order, k)
 
@@ -48,7 +53,7 @@ def  handle_growth_case(GF1, GF2, k, old_k, matrix_parts):
         update_existing_file(new_path, matrix_parts, GF2, k)
 
 def update_existing_file(file_path, matrix_parts, GF2, k):
-    """Atualiza um arquivo existente com a nova matriz combinada"""
+    """Updates an existing file with the new combined matrix."""
     with open(file_path, 'r') as file:
         existing_data = [line.strip().split() for line in file.readlines()]
     
@@ -58,12 +63,14 @@ def update_existing_file(file_path, matrix_parts, GF2, k):
     write_on_file(updated_matrix, GF2, k)
 
 def determine_folder():
+    """Determines the directory where the growth CFF files will be stored."""
     script_dir = os.path.dirname(os.path.abspath(__file__))
     parent_dir = os.path.dirname(script_dir)
     folder = os.path.join(parent_dir, 'growth_cffs')
     return folder
 
 def generate_file(GF1, GF2, k, old_k, data_list, matrix_parts=None):
+    """Generates a file containing the matrix, creating the directory if necessary."""
     folder = determine_folder()
 
     if not os.path.exists(folder):
@@ -75,6 +82,7 @@ def generate_file(GF1, GF2, k, old_k, data_list, matrix_parts=None):
         handle_growth_case(GF1, GF2, k, old_k, matrix_parts)
 
 def create_matrix(GF1, k):
+    """Creates a matrix from the specified finite field and writes it to a file."""
     GF1 = galois.GF(GF1)
     GF1.repr('poly')
 
@@ -82,6 +90,7 @@ def create_matrix(GF1, k):
     generate_file(GF1, None, k, None, matrix)
 
 def grow_matrix(GF1, GF2, k, old_k):
+    """Expands an existing matrix to a new finite field and updates the corresponding file."""
     GF1 = galois.GF(GF1)
     GF1.repr('poly')
     GF2 = galois.GF(GF2)

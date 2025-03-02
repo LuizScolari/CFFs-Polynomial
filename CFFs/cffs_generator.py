@@ -2,6 +2,7 @@ import galois
 import itertools
 
 def generate_polynomials(GF1, GF2, k, old_k):
+    """Generates polynomials based on the given finite fields and parameters."""
     if GF2 == None and old_k == None:
         polynomial_vectors = list(itertools.product(GF1.elements, repeat=k+1))
         polynomials = [galois.Poly(vector, field=GF1) for vector in polynomial_vectors]
@@ -17,7 +18,10 @@ def generate_polynomials(GF1, GF2, k, old_k):
         lists = [elements_GF1, elements_GF2_less_GF1, elements_GF2]
 
         if old_k != k:
-            spec_line = generate_special_line(k)
+            spec_line = [0]
+            for i in range(k):
+                spec_line.append(1)
+
             element_GF1_s0 = [x for x in GF1.elements if int(x) != 0]
 
             pools = [element_GF1_s0]
@@ -28,7 +32,18 @@ def generate_polynomials(GF1, GF2, k, old_k):
             for vector in itertools.product(*pools):
                 polynomials_new.append(galois.Poly(list(vector), field=GF2))
 
-        pattern = generate_patterns(k)
+        pattern = []
+        for i in range(k+1):
+            pat = []
+            for j in range(k+1):
+                if(j<a):
+                    pat.append(0)
+                elif (j==a):
+                    pat.append(1)
+                else:
+                    pat.append(2)
+            a -= 1
+            pattern.append(pat)
 
         for pat in pattern:
             pools = [
@@ -49,30 +64,8 @@ def generate_polynomials(GF1, GF2, k, old_k):
 
         return polynomials_old, polynomials_new
 
-def generate_patterns(k):
-    a = k
-    pattern = []
-
-    for i in range(k+1):
-        pat = []
-        for j in range(k+1):
-            if(j<a):
-                pat.append(0)
-            elif (j==a):
-                pat.append(1)
-            else:
-                pat.append(2)
-        a -= 1
-        pattern.append(pat)
-    return pattern
-
-def generate_special_line(k):
-    pattern = [0]
-    for i in range(k):
-        pattern.append(1)
-    return pattern
-
 def generate_combinations(GF1, GF2):
+    """Generates all possible combinations of elements from the given finite fields."""
     if GF2 == None:
         combinations = list(itertools.product(GF1.elements, repeat=2))
         return combinations
@@ -92,6 +85,7 @@ def generate_combinations(GF1, GF2):
         return combinations_old, combinations_new
 
 def evaluate_polynomials(GF1, GF2, k, old_k):
+    """Evaluates polynomials based on the given finite fields and parameters."""
     if GF2 == None and old_k == None:
         polynomials = generate_polynomials(GF1, GF2, k, old_k)
         combinations = generate_combinations(GF1, GF2)
