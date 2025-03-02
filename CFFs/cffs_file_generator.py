@@ -67,22 +67,26 @@ def generate_file(GF1, GF2, k, old_k, data_list, matrix_parts=None):
     if not os.path.exists(folder):
         os.makedirs(folder)
 
-    if GF2 == None:
+    if GF2 == None and old_k == None:
         write_on_file(data_list, GF1, k)
     else:
         handle_growth_case(GF1, GF2, k, old_k, matrix_parts)
 
-def create_matrix(GF1, GF2, actual_k, old_k):
+def create_matrix(GF1, k):
+    GF1 = galois.GF(GF1)
+    GF1.repr('poly')
+
+    matrix = evaluate_polynomials(GF1, None, k, None)
+    generate_file(GF1, None, k, None, matrix)
+
+def grow_matrix(GF1, GF2, k, old_k):
     GF1 = galois.GF(GF1)
     GF1.repr('poly')
     GF2 = galois.GF(GF2)
     GF2.repr('poly')
 
-    if GF2 == None:
-        matrix = evaluate_polynomials(GF1, GF2, actual_k, old_k)
-        generate_file(GF1, GF2, actual_k, None, matrix)
-    else:
-        matrix_parts = evaluate_polynomials(GF1, GF2, actual_k, old_k)
-        generate_file(GF1, GF2, actual_k, old_k, None, matrix_parts=matrix_parts)
+    matrix_parts = evaluate_polynomials(GF1, GF2, k, old_k)
+    generate_file(GF1, GF2, k, old_k, None, matrix_parts=matrix_parts)
 
-create_matrix(2, 4, 2, 1)
+create_matrix(2,1)
+grow_matrix(2,4,2,1)
