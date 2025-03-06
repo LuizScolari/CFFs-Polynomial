@@ -1,80 +1,46 @@
-import pandas as pd
+import galois
 import time
-import os
-from cffs_generator import FiniteField
+from cffs_generator import generate_cff
 
-# List of test cases
-test_cases = [
-    {'p': 2, 'n': 1, 'k': 1},
-    {'p': 2, 'n': 1, 'k': 2},
-    {'p': 2, 'n': 2, 'k': 2},
-    {'p': 2, 'n': 2, 'k': 3},
-    {'p': 2, 'n': 3, 'k': 2},
-    {'p': 3, 'n': 2, 'k': 2},
-    {'p': 3, 'n': 2, 'k': 2},
-    {'p': 3, 'n': 2, 'k': 3},
-    {'p': 3, 'n': 3, 'k': 2},
-]
+def create_matrix(GF1, k):
+    GF1 = galois.GF(GF1)
+    GF1.repr('poly')
 
-# Dictionary to store the data
-datas = {
-    'p': [],
-    'n': [],
-    'k': [],
-    'Elements Time (s)': [],
-    'Polynomials Time (s)': [],
-    'Combinations Time (s)': [],
-    'Evaluation Time (s)': [],
-    'Total Time (s)': []
-}
+    cff = generate_cff(GF1, None, k, None)
+    return cff
 
-def calculate(p, n, k):
-    field = FiniteField(p, n, k)
+def grow_matrix(GF1, GF2, k, old_k):
+    GF1 = galois.GF(GF1)
+    GF1.repr('poly')
+    GF2 = galois.GF(GF2)
+    GF2.repr('poly')
 
-    # Measuring the time for each function
-    start = time.time()
-    elements = field._generate_elements()
-    elements_time = time.time() - start
+    cff_new_parts = generate_cff(GF1, GF2, k, old_k)
+    return cff_new_parts
 
-    start = time.time()
-    polynomials = field._generate_polynomials()
-    polynomials_time = time.time() - start
+def evaluate_time(cff, cff_old_new, cff_new_old, cff_new):
+    for i in range(len(cff_old_new)):
+        cff[i].extend(cff_old_new[i])
 
-    start = time.time()
-    combinations = field._generate_combinations()
-    combinations_time = time.time() - start
+    for i in range(len(cff_new)):
+        cff_new_old[i].extend(cff_new[i])
 
-    start = time.time()
-    evaluation = field.evaluate_polynomials()
-    evaluation_time = time.time() - start
+    for i in range(len(cff_new_old)):
+        cff.append(cff_new_old[i])
+    
+    return cff
 
-    total_time = elements_time + polynomials_time + combinations_time + evaluation_time
+start_initial_cff = time.time()
+cff = create_matrix(2,1)
+end_initial_cff = time.time()
 
-    return {
-        'p': p,
-        'n': n,
-        'k': k,
-        'Elements Time (s)': elements_time,
-        'Polynomials Time (s)': polynomials_time,
-        'Combinations Time (s)': combinations_time,
-        'Evaluation Time (s)': evaluation_time,
-        'Total Time (s)': total_time
-    }
+cff_old_new, cff_new_old, cff_new = grow_matrix(2,4,1,1)
+evaluate_time(cff, cff_old_new, cff_new_old, cff_new)
+end_grow_cff = time.time()
 
-# Calculating data for each test case and storing
-for case in test_cases:
-    result = calculate(case['p'], case['n'], case['k'])
-    for key in datas:
-        datas[key].append(result[key])
+create_matrix(4,1)
+end_direct_cff = time.time()
 
-# Creating a directory called 'time_calculator_tables' if it does not exist
-output_dir = 'time_calculator_tables'
-if not os.path.exists(output_dir):
-    os.makedirs(output_dir)
-
-# Path to the Excel file inside the 'time_calculator_tables' directory
-file_path = os.path.join(output_dir, 'test_cases_results.xlsx')
-
-# Creating a DataFrame and saving it as an Excel file
-df = pd.DataFrame(datas)
-df.to_excel(file_path, index=False)
+print("Initial CFF time: ", end_initial_cff-start_initial_cff)
+print("Grow CFF time: ", end_grow_cff-end_initial_cff)
+print("Direct CFF time: ", end_direct_cff-end_grow_cff)
