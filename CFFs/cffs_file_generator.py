@@ -1,4 +1,4 @@
-from cffs_generator import evaluate_polynomials
+from cffs_generator import generate_cff
 import os
 import galois
 
@@ -97,7 +97,7 @@ def create_matrix(GF1, k):
 
     condition = validate_condition(GF1, None, k, None)
     if condition == True:
-        matrix = evaluate_polynomials(GF1, None, k, None)
+        matrix = generate_cff(GF1, None, k, None)
         generate_file(GF1, None, k, None, matrix)
 
 def grow_matrix(GF1, GF2, k, old_k):
@@ -109,7 +109,7 @@ def grow_matrix(GF1, GF2, k, old_k):
 
     condition = validate_condition(GF1, GF2, k, old_k)
     if condition == True:
-        matrix_parts = evaluate_polynomials(GF1, GF2, k, old_k)
+        matrix_parts = generate_cff(GF1, GF2, k, old_k)
         generate_file(GF1, GF2, k, old_k, None, matrix_parts=matrix_parts)
 
 create_matrix(2,1)

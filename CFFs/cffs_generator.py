@@ -73,7 +73,7 @@ def generate_combinations(GF1, GF2):
             combinations_new.extend(comb2)
         return combinations_old, combinations_new
 
-def evaluate_polynomials(GF1, GF2, k, old_k):
+def generate_cff(GF1, GF2, k, old_k):
     """Evaluates polynomials based on the given finite fields and parameters."""
     if GF2 == None and old_k == None:
         polynomials = generate_polynomials(GF1, GF2, k, old_k)
