@@ -18,7 +18,7 @@ def grow_matrix(GF1, GF2, k, old_k):
     cff_new_parts = generate_cff(GF1, GF2, k, old_k)
     return cff_new_parts
 
-def evaluate_time(cff, cff_old_new, cff_new_old, cff_new):
+def group_new_cff(cff, cff_old_new, cff_new_old, cff_new):
     for i in range(len(cff_old_new)):
         cff[i].extend(cff_old_new[i])
 
@@ -35,7 +35,7 @@ cff = create_matrix(2,1)
 end_initial_cff = time.time()
 
 cff_old_new, cff_new_old, cff_new = grow_matrix(2,4,1,1)
-evaluate_time(cff, cff_old_new, cff_new_old, cff_new)
+group_new_cff(cff, cff_old_new, cff_new_old, cff_new)
 end_grow_cff = time.time()
 
 create_matrix(4,1)
