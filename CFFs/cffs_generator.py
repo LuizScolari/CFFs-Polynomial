@@ -20,11 +20,13 @@ def generate_polynomials(GF1, GF2, k, old_k):
         if old_k != k:
             element_GF1_s0 = [x for x in GF1.elements if int(x) != 0]
 
+            t = old_k
             for i in range(k - old_k):
-                pools = [element_GF1_s0] + [elements_GF1] * (k - old_k - i)
+                t += 1
+                pools = [element_GF1_s0] + [elements_GF1] * t
 
-            for vector in itertools.product(*pools):
-                polynomials_new.append(galois.Poly(list(vector), field=GF2))
+                for vector in itertools.product(*pools):
+                    polynomials_new.append(galois.Poly(list(vector), field=GF2))
 
         if GF1 != GF2:
             a = k
