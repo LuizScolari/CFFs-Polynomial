@@ -11,18 +11,18 @@ def combine_matrices(existing_matrix, cff_old_new, cff_new_old, cff_new):
 
 def validate_condition(GF1, GF2, k, old_k):
     """Validates the conditions."""
-    if GF2 == None:
+    if GF2 is None:
         d = (GF1.order - 1) // k
     else:
         d = (GF2.order - 1) // k
     if d == 0:
         print("CFF inválida d=0")
         return False
-    if GF2 != None:
+    if GF2 is not None:
         if GF1.order > GF2.order:
             print("O corpo finito deve ser maior ou igual")
             return False
-    if  old_k != None:
+    if old_k is not None:
         if old_k > k:
             print("O grau do polinômio não deve diminuir")
             return False
@@ -46,30 +46,22 @@ def write_on_file(data_list, GF_size, k):
             line = ' '.join(map(str, sublist))
             file.write(line + '\n')
 
-def  handle_growth_case(GF1, GF2, k, old_k, matrix_parts):
-    """Handles the growth case by renaming and updating files."""
-    filename = file_name(GF1.order, old_k)
-    new_filename = file_name(GF2.order, k)
-
+def handle_growth_case(GF1, GF2, k, old_k, matrix_parts):
+    """Handles the growth case by reading old file and creating a new combined one."""
+    old_filename = file_name(GF1.order, old_k)
     folder = determine_folder()
-    folder_path = os.path.join(folder, filename)
-    new_path = os.path.join(folder, new_filename)
+    old_file_path = os.path.join(folder, old_filename)
     
-    if os.path.exists(folder_path):
-        os.rename(folder_path, new_path)
-    
-    if os.path.exists(new_path):
-        update_existing_file(new_path, matrix_parts, GF2, k)
-
-def update_existing_file(file_path, matrix_parts, GF2, k):
-    """Updates an existing file with the new combined matrix."""
-    with open(file_path, 'r') as file:
-        existing_data = [line.strip().split() for line in file.readlines()]
-    
-    cff_old_new, cff_new_old, cff_new = matrix_parts
-    updated_matrix = combine_matrices(existing_data, cff_old_new, cff_new_old, cff_new)
-    
-    write_on_file(updated_matrix, GF2, k)
+    if os.path.exists(old_file_path):
+        with open(old_file_path, 'r') as file:
+            existing_data = [line.strip().split() for line in file.readlines()]
+        
+        cff_old_new, cff_new_old, cff_new = matrix_parts
+        combined_matrix = combine_matrices(existing_data, cff_old_new, cff_new_old, cff_new)
+        
+        write_on_file(combined_matrix, GF2, k)
+    else:
+        print(f"Arquivo original não encontrado: {old_file_path}")
 
 def determine_folder():
     """Determines the directory where the growth CFF files will be stored."""
@@ -85,7 +77,7 @@ def generate_file(GF1, GF2, k, old_k, data_list, matrix_parts=None):
     if not os.path.exists(folder):
         os.makedirs(folder)
 
-    if GF2 == None and old_k == None:
+    if GF2 is None and old_k is None:
         write_on_file(data_list, GF1, k)
     else:
         handle_growth_case(GF1, GF2, k, old_k, matrix_parts)
@@ -96,7 +88,7 @@ def create_matrix(GF1, k):
     GF1.repr('poly')
 
     condition = validate_condition(GF1, None, k, None)
-    if condition == True:
+    if condition:
         matrix = generate_cff(GF1, None, k, None)
         generate_file(GF1, None, k, None, matrix)
 
@@ -108,7 +100,7 @@ def grow_matrix(GF1, GF2, k, old_k):
     GF2.repr('poly')
 
     condition = validate_condition(GF1, GF2, k, old_k)
-    if condition == True:
+    if condition:
         matrix_parts = generate_cff(GF1, GF2, k, old_k)
         generate_file(GF1, GF2, k, old_k, None, matrix_parts=matrix_parts)
 
