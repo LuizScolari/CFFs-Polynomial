@@ -78,5 +78,5 @@ python generate_cff.py
 Contributions are welcome! Feel free to open issues or submit pull requests.
 
 ## 📜 License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/LuizScolari/CFFs-Polynomial/blob/main/LICENSE) file for details.
 
