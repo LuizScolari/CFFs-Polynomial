@@ -29,18 +29,9 @@ def generate_polynomials(GF1, GF2, k, old_k):
                     polynomials_new.append(galois.Poly(list(vector), field=GF2))
 
         if GF1 != GF2:
-            a = k
             pattern = []
-            for i in range(k+1):
-                pat = []
-                for j in range(k+1):
-                    if(j<a):
-                        pat.append(0)
-                    elif (j==a):
-                        pat.append(1)
-                    else:
-                        pat.append(2)
-                a -= 1
+            for i in range(k + 1):
+                pat = [0] * (k - i) + [1] + [2] * i
                 pattern.append(pat)
 
             for pat in pattern:
@@ -112,7 +103,7 @@ def generate_cff(GF1, GF2, k, old_k):
                 y = GF2(y)
                 lines.append(1 if poly(x) == y else 0)
             cff_new_old.append(lines)
-        
+
         cff_new = []
         for combination in combinations_new:
             lines = []
