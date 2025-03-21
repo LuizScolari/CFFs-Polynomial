@@ -1,7 +1,7 @@
 # CFFs-Polynomial
 
 ## 📌 Overview
-CFFs (Cover-Free Families) are combinatorial structures widely used in cryptography, coding theory, and group testing. These structures consist of collections of subsets where no subset is entirely covered by the union of others.
+CFFs (Cover-Free Families) are combinatorial structures used in cryptography, coding theory, and group testing. These structures consist of collections of subsets where no subset is entirely covered by the union of others.
 
 The **polynomial approach** to CFFs involves constructing these families using polynomials over finite fields, which helps optimize their size and efficiency for practical applications.
 
@@ -38,7 +38,7 @@ A 1-CFF(4,4) means that, for any block (or column), no block is entirely covered
   0 1 1 1
   0 0 0 1
 ```
-- Each row represents a subset.
+- Each columns represents a subset.
 - The structure ensures that no subset is fully contained within others.
 
 ### **Example 2: A Polynomial-Based CFF over GF(2)**
