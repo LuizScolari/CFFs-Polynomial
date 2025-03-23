@@ -15,6 +15,9 @@ This project aims to:
 - Generalize existing structures
 - Improve their applications in **computer science and cryptography**
 
+### 📚 Orientation
+This research is being oriented by **Professor Thaís Bardini Idalino** ([Website](https://thaisidalino.github.io), [Google Scholar](https://scholar.google.com/citations?user=hS_R7ZsAAAAJ&hl)).
+
 ## 🔗 Applications
 CFFs are utilized in various areas, such as:
 - **Non-adaptive Combinatorial Group Testing (CGT)**
