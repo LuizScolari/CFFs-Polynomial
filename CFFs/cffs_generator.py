@@ -119,7 +119,6 @@ def generate_cff(GF1, GF2, k, old_k):
                 block_line += 1
             else: 
                 count_block += 1
-            print(dic)
             cff.append(lines)
         return cff
     
