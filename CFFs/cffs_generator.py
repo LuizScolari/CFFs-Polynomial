@@ -66,17 +66,16 @@ def generate_combinations(GF1, GF2):
             comb2 = list(itertools.product(elements_GF2_less_GF1, GF2.elements))
             combinations_new.extend(comb2)
         return combinations_old, combinations_new
-    
-def _reduce_evaluation(GF1, k):
-    GF_size = GF1.order
-    dic = {}
-    values = [0]*(GF_size+1)
-    for i in range((GF_size ** (k + 1))//GF_size):
-        for j in range(GF_size):
-            dic[(j, i)] = [0] * (GF_size + 1)
-    return dic
 
 """
+def _reduce_evaluation(GF1, k):
+    dic = {}
+    for i in range((GF1.order ** (k + 1))//GF1.order):
+        for j in range(GF1.order):
+            dic[(j, i)] = [0] * (GF1.order + 1)
+    return dic
+
+
 GF1 = galois.GF(2)
 GF1.repr('poly')
 _reduce_evaluation(GF1, 1)
@@ -85,15 +84,19 @@ _reduce_evaluation(GF1, 1)
 def generate_cff(GF1, GF2, k, old_k):
     """Evaluates polynomials based on the given finite fields and parameters."""
     if GF2 == None and old_k == None:
-        dic = _reduce_evaluation(GF1, k)
         polynomials = generate_polynomials(GF1, GF2, k, old_k)
         combinations = generate_combinations(GF1, GF2)
+        dic = {}
+        for i in range((GF1.order ** (k + 1))//GF1.order):
+            for j in range(GF1.order):
+                dic[(j, i)] = [0] * (GF1.order + 1)
         count_block = 0
         block_line = 0
         cff = []
         for combination in combinations:
             count_collumn = 0
             block_column = 0
+            _bool_lines = [False] * ((GF1.order ** (k + 1))//GF1.order)
             lines = []          
             for poly in polynomials:
                 x, y = combination
@@ -103,12 +106,15 @@ def generate_cff(GF1, GF2, k, old_k):
                         lines.append(1)
                         dic[(block_line, block_column)][GF1.order] += 1
                         dic[(block_line, block_column)][count_collumn] += 1"""
+                elif _bool_lines[block_column] == True:
+                    lines.append(0)
                 else:
                     evaluate = 1 if poly(x) == y else 0
                     lines.append(evaluate)
                     if evaluate == 1:
                         dic[(block_line, block_column)][GF1.order] += 1
                         dic[(block_line, block_column)][count_collumn] += 1
+                        _bool_lines[block_column] = True
                 if count_collumn == GF1.order-1:
                     count_collumn = 0
                     block_column += 1
