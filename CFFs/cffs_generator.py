@@ -67,29 +67,17 @@ def generate_combinations(GF1, GF2):
             combinations_new.extend(comb2)
         return combinations_old, combinations_new
 
-"""
-def _reduce_evaluation(GF1, k):
-    dic = {}
-    for i in range((GF1.order ** (k + 1))//GF1.order):
-        for j in range(GF1.order):
-            dic[(j, i)] = [0] * (GF1.order + 1)
-    return dic
-
-
-GF1 = galois.GF(2)
-GF1.repr('poly')
-_reduce_evaluation(GF1, 1)
-"""
-
 def generate_cff(GF1, GF2, k, old_k):
     """Evaluates polynomials based on the given finite fields and parameters."""
     if GF2 == None and old_k == None:
         polynomials = generate_polynomials(GF1, GF2, k, old_k)
         combinations = generate_combinations(GF1, GF2)
+
         dic = {}
         for i in range((GF1.order ** (k + 1))//GF1.order):
             for j in range(GF1.order):
                 dic[(j, i)] = [0] * (GF1.order + 1)
+
         count_block = 0
         block_line = 0
         cff = []
@@ -100,14 +88,13 @@ def generate_cff(GF1, GF2, k, old_k):
             lines = []          
             for poly in polynomials:
                 x, y = combination
+
                 if dic[(block_line, block_column)][count_collumn] == 1:
                     lines.append(0)
-                    """elif dic[(block_line, block_column)][GF1.order] == GF1.order-1 and dic[(block_line, block_column)][count_collumn] != 1:
-                        lines.append(1)
-                        dic[(block_line, block_column)][GF1.order] += 1
-                        dic[(block_line, block_column)][count_collumn] += 1"""
                 elif _bool_lines[block_column] == True:
                     lines.append(0)
+                elif dic[(block_line, block_column)][count_collumn] == 0 and count_block == GF1.order-1:
+                    lines.append(1)
                 else:
                     evaluate = 1 if poly(x) == y else 0
                     lines.append(evaluate)
@@ -115,16 +102,19 @@ def generate_cff(GF1, GF2, k, old_k):
                         dic[(block_line, block_column)][GF1.order] += 1
                         dic[(block_line, block_column)][count_collumn] += 1
                         _bool_lines[block_column] = True
+
                 if count_collumn == GF1.order-1:
                     count_collumn = 0
                     block_column += 1
                 else:
                     count_collumn += 1
+
             if count_block == GF1.order-1:
                 count_block = 0 
                 block_line += 1
             else: 
                 count_block += 1
+
             cff.append(lines)
         return cff
     
