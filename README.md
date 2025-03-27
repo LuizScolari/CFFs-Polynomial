@@ -38,8 +38,8 @@ A 1-CFF(4,4) means that, for any block (or column), no block is entirely covered
 ```
   1 1 0 0
   1 0 1 0
-  0 1 1 1
-  0 0 0 1
+  0 1 0 1
+  0 0 1 1
 ```
 - Each column represents a subset.
 - The structure ensures that no subset is fully contained within others.
