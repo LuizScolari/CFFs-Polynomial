@@ -76,7 +76,7 @@ def generate_cff(GF1, GF2, k, old_k):
         dic = {}
         for i in range((GF1.order ** (k + 1))//GF1.order):
             for j in range(GF1.order):
-                dic[(j, i)] = [0] * (GF1.order + 1)
+                dic[(j, i)] = [0] * (GF1.order)
 
         count_block = 0
         block_line = 0
@@ -88,18 +88,26 @@ def generate_cff(GF1, GF2, k, old_k):
             lines = []          
             for poly in polynomials:
                 x, y = combination
-
+                
+                #se já tiver um 1 na coluna do bloco, adiciona 0
                 if dic[(block_line, block_column)][count_collumn] == 1:
                     lines.append(0)
+                #se já tiber um 1 na linha do bloco, adiciona 0
                 elif _bool_lines[block_column] == True:
                     lines.append(0)
+                #se eu estiver no último elemento de qualquer linha do bloco e ainda não tem nenhum 1 na linha, adiciono 1
+                elif count_collumn == GF1.order-1 and _bool_lines[block_column] == False:
+                    lines.append(1)
+                    _bool_lines[block_column] = True
+                #se estou na última linha, a coluna que estiver sem nenhum 1, adiciono 1
                 elif dic[(block_line, block_column)][count_collumn] == 0 and count_block == GF1.order-1:
                     lines.append(1)
+                    _bool_lines[block_column] = True
+                #caso nenhum dos casos ocorreram, avalio o polinômio
                 else:
                     evaluate = 1 if poly(x) == y else 0
                     lines.append(evaluate)
                     if evaluate == 1:
-                        dic[(block_line, block_column)][GF1.order] += 1
                         dic[(block_line, block_column)][count_collumn] += 1
                         _bool_lines[block_column] = True
 
