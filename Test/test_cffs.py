@@ -2,7 +2,7 @@ import sys
 sys.path.append('/Users/luizscolari/Documents/GitHub Projects/CFFs-Polynomial')
 
 
-from CFFs.cffs_generator import FiniteField
+from Generate_CFF.cffs_generator import FiniteField
 
 # q = pˆn
 p = 2
