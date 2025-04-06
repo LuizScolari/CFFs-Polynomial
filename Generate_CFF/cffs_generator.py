@@ -3,6 +3,12 @@ import itertools
 
 def generate_polynomials(GF1, GF2, k, old_k):
     """Generates polynomials based on the given finite fields and parameters."""
+
+    def sort_key(poly):
+        # Converte coeficientes para inteiros baseados em GF1 para ordenação consistente
+        coeffs = [int(c) if int(c) in GF1.elements else int(c) for c in poly.coeffs]
+        return (poly.degree, tuple(coeffs))  # Ordena primeiro por grau, depois por coeficientes
+    
     if GF2 == None and old_k == None:
         polynomial_vectors = list(itertools.product(GF1.elements, repeat=k+1))
         polynomials = [galois.Poly(vector, field=GF1) for vector in polynomial_vectors]
@@ -44,6 +50,9 @@ def generate_polynomials(GF1, GF2, k, old_k):
             polynomial_vectors = list(itertools.product(elements_GF1, repeat=(old_k if old_k != k else k)+1))
             for vector in polynomial_vectors:
                 polynomials_old.append(galois.Poly(list(vector), field=GF2))
+
+        polynomials_old.sort(key=sort_key)
+        polynomials_new.sort(key=sort_key)
 
         return polynomials_old, polynomials_new
 
