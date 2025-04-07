@@ -1,28 +1,79 @@
 import galois
 import itertools
 
-def generate_polynomials(GF1, GF2, k, old_k):
+def generate_polynomials(GF1, GF2, k, old_k, steps):
     """Generates polynomials based on the given finite fields and parameters."""
 
-    def sort_key(poly):
-        # Converte coeficientes para inteiros baseados em GF1 para ordenação consistente
-        coeffs = [int(c) if int(c) in GF1.elements else int(c) for c in poly.coeffs]
-        return (poly.degree, tuple(coeffs))  # Ordena primeiro por grau, depois por coeficientes
-    
-    if GF2 == None and old_k == None:
+    # Initial case: no previous field or polynomial degree
+    if GF2 is None and old_k is None:
         polynomial_vectors = list(itertools.product(GF1.elements, repeat=k+1))
         polynomials = [galois.Poly(vector, field=GF1) for vector in polynomial_vectors]
         return polynomials
     else:
+        polynomials_new = []
+        polynomials_old = []
+
+        # Generate polynomials for each step
+        for index, step in enumerate(steps, start=0):
+            # First step: generate all polynomials from elements of GFd
+            if index == 0:
+                GFd = galois.GF(step[0])
+                GFd.repr('poly')
+
+                polynomial_vectors = list(itertools.product(GFd.elements, repeat=(step[1])+1))
+
+                for vector in polynomial_vectors:
+                    polynomials_old.append(galois.Poly(list(vector), field=GF2))
+
+            # Subsequent steps
+            else:
+                GF_last_step = galois.GF(_last_step[0])
+                GF_last_step.repr('poly')
+                GF_new_step = galois.GF(step[0])
+                GF_new_step.repr('poly')
+
+                elements_last_step = GF_last_step.elements
+                elements_new_less_last = [x for x in GF_new_step.elements if int(x) not in elements_last_step]
+                elements_new_step = GF_new_step.elements
+
+                lists = [elements_last_step, elements_new_less_last, elements_new_step]
+                
+                # Case 1: Polynomial degree increased
+                if _last_step[1] != step[1]:
+                    element_last_s0 = [x for x in GF_last_step.elements if int(x) != 0]
+
+                    t = _last_step[2]
+                    for i in range(step[2] - _last_step[2]):
+                        t += 1
+                        pools = [element_last_s0] + [GF_last_step] * t
+
+                        for vector in itertools.product(*pools):
+                            polynomials_old.append(galois.Poly(list(vector), field=GF2))
+
+                # Case 2: Finite field was expanded
+                if _last_step[0] != step[0]:
+                    pattern = []
+                    for i in range(step[1] + 1):
+                        pat = [0] * (step[1] - i) + [1] + [2] * i
+                        pattern.append(pat)
+
+                    for pat in pattern:
+                        pools = [lists[j] for j in pat]
+
+                        for vector in itertools.product(*pools):
+                            polynomials_old.append(galois.Poly(list(vector), field=GF2))
+                            
+            _last_step = step
+        
+        # Generate new polynomials for the final step
+
         elements_GF1 = GF1.elements
         elements_GF2_less_GF1 = [x for x in GF2.elements if int(x) not in elements_GF1]
         elements_GF2 = GF2.elements
 
-        polynomials_new = []
-        polynomials_old = []
-
         lists = [elements_GF1, elements_GF2_less_GF1, elements_GF2]
 
+        # Case 1: Polynomial degree increased
         if old_k != k:
             element_GF1_s0 = [x for x in GF1.elements if int(x) != 0]
 
@@ -34,6 +85,7 @@ def generate_polynomials(GF1, GF2, k, old_k):
                 for vector in itertools.product(*pools):
                     polynomials_new.append(galois.Poly(list(vector), field=GF2))
 
+        # Case 2: Field changed from GF1 to GF2
         if GF1 != GF2:
             pattern = []
             for i in range(k + 1):
@@ -46,41 +98,72 @@ def generate_polynomials(GF1, GF2, k, old_k):
                 for vector in itertools.product(*pools):
                     polynomials_new.append(galois.Poly(list(vector), field=GF2))
 
-        
-            polynomial_vectors = list(itertools.product(elements_GF1, repeat=(old_k if old_k != k else k)+1))
-            for vector in polynomial_vectors:
-                polynomials_old.append(galois.Poly(list(vector), field=GF2))
+    return polynomials_old, polynomials_new
 
-        polynomials_old.sort(key=sort_key)
-        polynomials_new.sort(key=sort_key)
-
-        return polynomials_old, polynomials_new
-
-def generate_combinations(GF1, GF2):
+def generate_combinations(GF1, GF2, steps):
     """Generates all possible combinations of elements from the given finite fields."""
-    if GF2 == None:
+
+    # Initial case: only one field is provided
+    if GF2 is None:
         combinations = list(itertools.product(GF1.elements, repeat=2))
         return combinations
-    else: 
-        elements_GF1 = GF1.elements
-        elements_GF2_less_GF1 = [x for x in GF2.elements if int(x) not in elements_GF1] 
-
+    else:
         combinations_old = []
         combinations_new = []
-        comb0 = list(itertools.product(elements_GF1, elements_GF1))
-        combinations_old.extend(comb0)
-        if GF1 != GF2:
-            comb1 = list(itertools.product(elements_GF1, elements_GF2_less_GF1))
-            combinations_new.extend(comb1)
-            comb2 = list(itertools.product(elements_GF2_less_GF1, GF2.elements))
-            combinations_new.extend(comb2)
+
+        # Iterate through the list of steps
+        for index, step in enumerate(steps, start=0):
+            if index == 0:
+                # First step: generate all pairwise combinations within the field
+                GFd = galois.GF(step[0])
+                GFd.repr('poly')
+
+                comb0 = list(itertools.product(GFd.elements, GFd.elements))
+                combinations_old.extend(comb0)
+            
+            else:
+                # On field expansion: generate combinations using new elements
+                if _last_step[0] != step[0]:
+                    GF_last_step = galois.GF(_last_step[0])
+                    GF_last_step.repr('poly')
+                    GF_new_step = galois.GF(step[0])
+                    GF_new_step.repr('poly')
+
+                    elements_last_step = GF_last_step.elements
+                    elements_new_less_last = [x for x in GF_new_step.elements if int(x) not in GF_last_step.elements] 
+                    elements_new_step = GF_new_step.elements
+
+                    # Combinations between old and new elements
+                    comb1 = list(itertools.product(elements_last_step, elements_new_less_last))
+                    combinations_old.extend(comb1)
+
+                    # Combinations involving all new elements
+                    comb2 = list(itertools.product(elements_new_less_last, elements_new_step))
+                    combinations_old.extend(comb2)
+
+            _last_step = step
+
+        # Generate combinations for the final step between GF1 and GF2
+
+        elements_GF1 = GF1.elements
+        elements_GF2_less_GF1 = [x for x in GF2.elements if int(x) not in elements_GF1] 
+        elements_GF2 = GF2.elements
+
+        # Combinations from GF1 to the new elements in GF2
+        comb1 = list(itertools.product(elements_GF1, elements_GF2_less_GF1))
+        combinations_new.extend(comb1)
+
+        # Combinations involving new elements with full GF2
+        comb2 = list(itertools.product(elements_GF2_less_GF1, elements_GF2))
+        combinations_new.extend(comb2)
+
         return combinations_old, combinations_new
 
-def generate_cff(GF1, GF2, k, old_k):
+def generate_cff(GF1, GF2, k, old_k, steps):
     """Evaluates polynomials based on the given finite fields and parameters."""
     if GF2 == None and old_k == None:
-        polynomials = generate_polynomials(GF1, GF2, k, old_k)
-        combinations = generate_combinations(GF1, GF2)
+        polynomials = generate_polynomials(GF1, GF2, k, old_k, None)
+        combinations = generate_combinations(GF1, GF2, None)
 
         dic = {}
         for i in range((GF1.order ** (k + 1))//GF1.order):
@@ -136,8 +219,8 @@ def generate_cff(GF1, GF2, k, old_k):
         return cff
     
     else:
-        polynomials_old, polynomials_new = generate_polynomials(GF1, GF2, k, old_k)
-        combinations_old, combinations_new = generate_combinations(GF1, GF2)
+        polynomials_old, polynomials_new = generate_polynomials(GF1, GF2, k, old_k, steps)
+        combinations_old, combinations_new = generate_combinations(GF1, GF2, steps)
         cff_old_new = []
         for combination in combinations_old:
             lines = []
