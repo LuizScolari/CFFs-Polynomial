@@ -74,6 +74,7 @@ def handle_growth_case(GF1, GF2, k, old_k, matrix_parts, steps):
         print(f"Arquivo original não encontrado: {old_file_path}")
 
 def read_growth_form(GF1, old_k):
+    """Read the file to get previous steps."""
     old_filename = file_name(GF1.order, old_k)
     folder = determine_folder()
     old_file_path = os.path.join(folder, old_filename)
