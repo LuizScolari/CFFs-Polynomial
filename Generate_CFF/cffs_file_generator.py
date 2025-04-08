@@ -122,7 +122,7 @@ def create_matrix(GF1, k):
     condition = validate_condition(GF1, None, k, None)
     if condition:
         matrix = generate_cff(GF1, None, k, None, None)
-        generate_file(GF1, None, k, None, None, matrix)
+        generate_file(GF1, None, k, None, steps, matrix)
 
 def grow_matrix(GF1, GF2, k, old_k):
     """Expands an existing matrix to a new finite field and updates the corresponding file."""
