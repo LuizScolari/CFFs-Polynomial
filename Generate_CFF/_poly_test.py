@@ -52,11 +52,11 @@ GF2.repr('poly')
 steps = [(2, 1)]
 
 
-_grow_polys = generate_combinations(GF1,GF2,steps)
+_grow_polys = generate_combinations(GF1,GF2,1,steps)
 GF3 = galois.GF(16)
 GF3.repr('poly')
 steps = [(2, 1),(4, 1)]
-_grow_polys_1 = generate_combinations(GF2,GF3,steps)
+_grow_polys_1 = generate_combinations(GF2,GF3,1,steps)
 
 
 # Check combinations, first grow w/ second grow
