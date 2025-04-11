@@ -110,7 +110,6 @@ def generate_file(GF1, GF2, k, old_k, steps, data_list, matrix_parts=None):
     if GF2 is None and old_k is None:
         write_on_file(data_list, GF1, k, steps)
     else:
-        steps.append((GF2.order, k))
         handle_growth_case(GF1, GF2, k, old_k, matrix_parts, steps)
 
 def create_matrix(GF1, k):
@@ -132,11 +131,12 @@ def grow_matrix(GF1, GF2, k, old_k):
     GF2.repr('poly')
 
     steps = read_growth_form(GF1, old_k)
+    steps.append((GF2.order, k))
 
     condition = validate_condition(GF1, GF2, k, old_k)
     if condition:
         matrix_parts = generate_cff(GF1, GF2, k, old_k, steps)
         generate_file(GF1, GF2, k, old_k, steps, None, matrix_parts=matrix_parts)
 
-create_matrix(2,1)
+#create_matrix(2,1)
 grow_matrix(2,4,1,1)
