@@ -107,4 +107,4 @@ def grow_matrix(GF1, GF2, k, old_k):
         generate_file(GF1, GF2, k, old_k, None, matrix_parts=matrix_parts)
 
 create_matrix(4,16,1,None)
-#grow_matrix(2,2,1,1)
+grow_matrix(4,16,1,1)
