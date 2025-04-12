@@ -11,13 +11,13 @@ GF1 = galois.GF(2)
 GF1.repr('poly')
 GF2 = galois.GF(4)
 GF2.repr('poly')
-steps = [(2, 1)]
+steps = [(2, 1),(4, 1)]
 
 
 _grow_polys = generate_polynomials(GF1,GF2,1,1,steps)
 GF3 = galois.GF(16)
 GF3.repr('poly')
-steps = [(2, 1),(4, 1)]
+steps = [(2, 1),(4, 1),(16,1)]
 _grow_polys_1 = generate_polynomials(GF2,GF3,1,1,steps)
 
 direct = generate_polynomials(GF1,None,1,None, None)
@@ -49,13 +49,13 @@ GF1 = galois.GF(2)
 GF1.repr('poly')
 GF2 = galois.GF(4)
 GF2.repr('poly')
-steps = [(2, 1)]
+steps = [(2, 1),(4, 1)]
 
 
 _grow_polys = generate_combinations(GF1,GF2,1,steps)
 GF3 = galois.GF(16)
 GF3.repr('poly')
-steps = [(2, 1),(4, 1)]
+steps = [(2, 1),(4, 1),(16,1)]
 _grow_polys_1 = generate_combinations(GF2,GF3,1,steps)
 
 
