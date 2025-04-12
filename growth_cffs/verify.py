@@ -43,11 +43,13 @@ def is_cff(blocks, d):
     print("Yes")
 
 def main():
-    file_path = file_path = '/Users/luizscolari/Documents/GitHub Projects/CFFs-Polynomial/growth_cffs/1-CFF(16,64).txt'  
+    file_path = file_path = '/Users/luizscolari/Documents/GitHub Projects/CFFs-Polynomial/growth_cffs/15-CFF(256,256).txt'  
     matrix = read_matrix_from_file(file_path)
     blocks = process_columns(matrix)
 
-    is_cff(blocks,1)
+    for block in blocks:
+        print(len(block))
+    #is_cff(blocks,1)
 
 if __name__ == "__main__":
     main()
