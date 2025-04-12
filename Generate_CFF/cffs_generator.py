@@ -3,9 +3,12 @@ import itertools
 
 def generate_polynomials(GF1, GF2, k, old_k):
     """Generates polynomials based on the given finite fields and parameters."""
-    if GF2 == None and old_k == None:
-        polynomial_vectors = list(itertools.product(GF1.elements, repeat=k+1))
-        polynomials = [galois.Poly(vector, field=GF1) for vector in polynomial_vectors]
+    if old_k == None:
+        elements_GF1 = GF1.elements
+        elements_GF1 = GF2(elements_GF1)
+        polynomial_vectors = list(itertools.product(elements_GF1, repeat=k+1))
+        polynomials = [galois.Poly(vector, field=GF2) for vector in polynomial_vectors]
+        print(polynomials)
         return polynomials
     else:
         elements_GF1 = GF1.elements
@@ -49,8 +52,12 @@ def generate_polynomials(GF1, GF2, k, old_k):
 
 def generate_combinations(GF1, GF2):
     """Generates all possible combinations of elements from the given finite fields."""
-    if GF2 == None:
-        combinations = list(itertools.product(GF1.elements, repeat=2))
+    if GF2 != None:
+        elements_GF1 = GF1.elements
+        elements_GF1 = GF2(elements_GF1)
+        combinations = list(itertools.product(elements_GF1, repeat=2))
+        for comb in combinations:
+            print(comb)
         return combinations
     else: 
         elements_GF1 = GF1.elements
@@ -69,7 +76,7 @@ def generate_combinations(GF1, GF2):
 
 def generate_cff(GF1, GF2, k, old_k):
     """Evaluates polynomials based on the given finite fields and parameters."""
-    if GF2 == None and old_k == None:
+    if old_k == None:
         polynomials = generate_polynomials(GF1, GF2, k, old_k)
         combinations = generate_combinations(GF1, GF2)
         cff = []
@@ -77,6 +84,7 @@ def generate_cff(GF1, GF2, k, old_k):
             lines = []
             for poly in polynomials:
                 x, y = combination
+                print(type(x), type(y))
                 lines.append(1 if poly(x) == y else 0)
             cff.append(lines)
         return cff

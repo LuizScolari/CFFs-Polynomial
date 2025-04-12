@@ -82,14 +82,16 @@ def generate_file(GF1, GF2, k, old_k, data_list, matrix_parts=None):
     else:
         handle_growth_case(GF1, GF2, k, old_k, matrix_parts)
 
-def create_matrix(GF1, k):
+def create_matrix(GF1,GF2,k,old_k):
     """Creates a matrix from the specified finite field and writes it to a file."""
     GF1 = galois.GF(GF1)
     GF1.repr('poly')
+    GF2 = galois.GF(GF2)
+    GF2.repr('poly')
 
     condition = validate_condition(GF1, None, k, None)
     if condition:
-        matrix = generate_cff(GF1, None, k, None)
+        matrix = generate_cff(GF1, GF2, k, None)
         generate_file(GF1, None, k, None, matrix)
 
 def grow_matrix(GF1, GF2, k, old_k):
@@ -104,5 +106,5 @@ def grow_matrix(GF1, GF2, k, old_k):
         matrix_parts = generate_cff(GF1, GF2, k, old_k)
         generate_file(GF1, GF2, k, old_k, None, matrix_parts=matrix_parts)
 
-create_matrix(2,1)
-grow_matrix(2,4,1,1)
+create_matrix(4,16,1,None)
+#grow_matrix(2,2,1,1)
