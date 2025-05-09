@@ -42,10 +42,10 @@ def generate_polynomials(GF1, GF2, k, old_k, steps):
                 if _last_step[1] != step[1]:
                     element_last_s0 = [x for x in GF_last_step.elements if int(x) != 0]
 
-                    t = _last_step[2]
-                    for i in range(step[2] - _last_step[2]):
+                    t = _last_step[1]
+                    for i in range(step[1] - _last_step[1]):
                         t += 1
-                        pools = [element_last_s0] + [GF_last_step] * t
+                        pools = [element_last_s0] + [elements_last_step] * t
 
                         if (GF2.order != step[0] or k != step[1]):
                             for vector in itertools.product(*pools):
