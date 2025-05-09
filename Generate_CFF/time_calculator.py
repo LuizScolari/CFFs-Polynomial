@@ -6,7 +6,8 @@ from cffs_generator import generate_cff
 def create_matrix(GF1, k):
     GF1 = galois.GF(GF1)
     GF1.repr('poly')
-    cff = generate_cff(GF1, None, k, None)
+    steps = [(GF1.order, k)]
+    cff = generate_cff(GF1, None, k, None, steps)
     return cff
 
 def grow_matrix(GF1, GF2, k, old_k):
@@ -14,7 +15,8 @@ def grow_matrix(GF1, GF2, k, old_k):
     GF1.repr('poly')
     GF2 = galois.GF(GF2)
     GF2.repr('poly')
-    cff_new_parts = generate_cff(GF1, GF2, k, old_k)
+    steps = [(GF1.order, old_k),(GF2.order, k)]
+    cff_new_parts = generate_cff(GF1, GF2, k, old_k, steps)
     return cff_new_parts
 
 def group_new_cff(cff, cff_old_new, cff_new_old, cff_new):
