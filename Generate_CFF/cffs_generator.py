@@ -11,7 +11,8 @@ def generate_polynomials(GF1, GF2, k, old_k, steps):
         return polynomials
     else:
         polynomials_new = []
-        polynomials_old = []
+        polynomials_old_GF1 = []
+        polynomials_old_GF2 = []
 
         # Generate polynomials for each step
         for index, step in enumerate(steps, start=0):
@@ -23,7 +24,9 @@ def generate_polynomials(GF1, GF2, k, old_k, steps):
                 polynomial_vectors = list(itertools.product(GFd.elements, repeat=(step[1])+1))
 
                 for vector in polynomial_vectors:
-                    polynomials_old.append(galois.Poly(list(vector), field=GF2))
+                    polynomials_old_GF1.append(galois.Poly(list(vector), field=GF1))
+                for vector in polynomial_vectors:
+                    polynomials_old_GF2.append(galois.Poly(list(vector), field=GF2))
 
             # Subsequent steps
             else:
@@ -49,7 +52,9 @@ def generate_polynomials(GF1, GF2, k, old_k, steps):
 
                         if (GF2.order != step[0] or k != step[1]):
                             for vector in itertools.product(*pools):
-                                polynomials_old.append(galois.Poly(list(vector), field=GF2))
+                                polynomials_old_GF1.append(galois.Poly(list(vector), field=GF1))
+                            for vector in itertools.product(*pools):
+                                polynomials_old_GF2.append(galois.Poly(list(vector), field=GF2))
                         else:
                             for vector in itertools.product(*pools):
                                 polynomials_new.append(galois.Poly(list(vector), field=GF2))
@@ -66,14 +71,16 @@ def generate_polynomials(GF1, GF2, k, old_k, steps):
 
                         if (GF2.order != step[0] or k != step[1]):
                             for vector in itertools.product(*pools):
-                                polynomials_old.append(galois.Poly(list(vector), field=GF2))
+                                polynomials_old_GF1.append(galois.Poly(list(vector), field=GF1))
+                            for vector in itertools.product(*pools):
+                                polynomials_old_GF2.append(galois.Poly(list(vector), field=GF2))
                         else:
                             for vector in itertools.product(*pools):
                                 polynomials_new.append(galois.Poly(list(vector), field=GF2))
 
             _last_step = step
         
-    return polynomials_old, polynomials_new
+    return polynomials_old_GF1, polynomials_old_GF2, polynomials_new
 
 def generate_combinations(GF1, GF2, k, steps):
     """Generates all possible combinations of elements from the given finite fields."""
@@ -188,7 +195,7 @@ def generate_cff(GF1, GF2, k, old_k, steps):
         return cff
     
     else:
-        polynomials_old, polynomials_new = generate_polynomials(GF1, GF2, k, old_k, steps)
+        polynomials_old_GF1, polynomials_old_GF2, polynomials_new = generate_polynomials(GF1, GF2, k, old_k, steps)
         combinations_old, combinations_new = generate_combinations(GF1, GF2, k, steps)
         cff_old_new = []
         for combination in combinations_old:
@@ -203,11 +210,16 @@ def generate_cff(GF1, GF2, k, old_k, steps):
         cff_new_old = []
         for combination in combinations_new:
             lines = []
-            for poly in polynomials_old:
+            for poly_GF1, poly_GF2 in zip(polynomials_old_GF1, polynomials_old_GF2):
                 x, y = combination
-                x = GF2(x) 
-                y = GF2(y)
-                lines.append(1 if poly(x) == y else 0)
+                if int(x) in [int(e) for e in GF1.elements] and int(y) not in [int(e) for e in GF1.elements]:
+                    x = GF1(x) 
+                    y = GF2(y)
+                    lines.append(1 if int(poly_GF1(x)) == int(y) else 0)
+                else:
+                    x = GF2(x) 
+                    y = GF2(y)
+                    lines.append(1 if poly_GF2(x) == y else 0)
             cff_new_old.append(lines)
 
         cff_new = []
