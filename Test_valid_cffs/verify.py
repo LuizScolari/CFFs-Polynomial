@@ -1,3 +1,5 @@
+from itertools import combinations
+
 def read_matrix_from_file(file_path):
     with open(file_path, 'r') as file:
         matrix = [list(map(int, line.strip().split())) for line in file.readlines()]
@@ -30,24 +32,37 @@ def union(blocks):
 
 def is_cff(blocks, d):
     n = len(blocks)
-    for i in range(n):
-        for j in range(1 << n):
-            selected_blocks = []
-            for k in range(n):
-                if (j & (1 << k)) != 0 and k != i:
-                    selected_blocks.append(blocks[k])
-            if len(selected_blocks) == d:
-                if is_subset(blocks[i], union(selected_blocks)):
-                    print("No")
-                    return False
+    for i in range(1):
+        # t = block to test [0,n-1]
+        t = 230
+
+        # select all the blocks, except t
+        other_indices = [k for k in range(n) if k != t]
+
+        # generate all combinations (choose d in n-1)
+        count = 0
+        for comb in combinations(other_indices, d):
+            if count >= 10000:
+                break
+
+            # select the block
+            selected_blocks = [blocks[k] for k in comb]
+
+            # check if is cff
+            if is_subset(blocks[t], union(selected_blocks)):
+                print("No")
+                return False
+            
+            count+=1
     print("Yes")
+    return True
 
 def main():
-    file_path = file_path = '/Users/luizscolari/Documents/GitHub Projects/CFFs-Polynomial/Cffs_samples_growth/1-CFF(4,4).txt'  
+    file_path = file_path = '/Users/luizscolari/Documents/GitHub Projects/CFFs-Polynomial/growth_cffs/15-CFF(256,256).txt'  
     matrix = read_matrix_from_file(file_path)
     blocks = process_columns(matrix)
 
-    is_cff(blocks,1)
+    is_cff(blocks,15)
 
 if __name__ == "__main__":
     main()
