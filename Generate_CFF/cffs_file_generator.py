@@ -89,7 +89,8 @@ def read_growth_form(GF1, old_k):
                     tuples = line.replace('(', '').replace(')', '').split()
 
                     for item in tuples:
-                        _tuple = (int(item[0]),int(item[2]))  
+                        a, b = item.split(',')
+                        _tuple = (int(a), int(b))
                         growth_form.append(_tuple)
     return growth_form
 
