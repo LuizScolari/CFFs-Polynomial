@@ -195,6 +195,8 @@ def generate_cff(GF1, GF2, k, old_k, steps):
         gap_new_poly = GF1.order**(k)*(GF2.order-GF1.order)
         if k!=old_k:
             gap_new_poly += GF1.order**(k+1)
+
+        gap_new_comb = GF1.order*(GF2.order-GF1.order)
         
         totalPolynomials = 0
         for i in range(k):
@@ -202,21 +204,13 @@ def generate_cff(GF1, GF2, k, old_k, steps):
         
         totalBlocks_collumns = int(totalPolynomials/GF2.order)
 
-        totalCombinations_old = int(len(combinations_old)/GF2.order)
-        totalCombinations_new = int(len(combinations_new)/GF2.order)
-
-        dic_old_new = {}
-        for i in range(totalBlocks_collumns):
-            for j in range(totalCombinations_old):
-                dic_old_new[(j, i)] = [0] * (GF2.order)
+        totalCombinations = int(((GF2.order-GF1.order)*GF2.order)/GF2.order)
         
         dic_new_new = {}
         for i in range(totalBlocks_collumns):
-            for j in range(totalCombinations_new):
+            for j in range(totalCombinations):
                 dic_new_new[(j, i)] = [0] * (GF2.order)
-
-        count_block = 0
-        block_line = 0
+        
         cff_old_new = []
         for combination in combinations_old:
             lines = []
@@ -224,45 +218,9 @@ def generate_cff(GF1, GF2, k, old_k, steps):
             x, y = combination
             x = GF2(x) 
             y = GF2(y)
-
-            count_collumn = 0
-            block_column = 0
-            _bool_lines = [False] * (totalBlocks_collumns)
-            count_gap = 0
             
             for poly in polynomials_new:
-                if (count_gap<gap_new_poly):
-                    lines.append(1 if poly(x) == y else 0)
-                    count_gap+=1
-
-                else:
-                    if dic_old_new[(block_line, block_column)][count_collumn] == 1:
-                        lines.append(0)
-                    elif _bool_lines[block_column] == True:
-                        lines.append(0)
-                    elif count_collumn == GF2.order-1 and _bool_lines[block_column] == False:
-                        lines.append(1)
-                        _bool_lines[block_column] = True
-                    elif dic_old_new[(block_line, block_column)][count_collumn] == 0 and count_block == GF2.order-1:
-                        lines.append(1)
-                        _bool_lines[block_column] = True
-                    else:
-                        evaluate = 1 if poly(x) == y else 0
-                        lines.append(evaluate)
-                        if evaluate == 1:
-                            dic_old_new[(block_line, block_column)][count_collumn] += 1
-                            _bool_lines[block_column] = True
-
-                    if count_collumn == GF2.order-1:
-                        count_collumn = 0
-                        block_column += 1
-                    else:
-                        count_collumn += 1
-            if count_block == GF2.order-1:
-                count_block = 0 
-                block_line += 1
-            else: 
-                count_block += 1
+                lines.append(1 if poly(x) == y else 0)
 
             cff_old_new.append(lines)
             
@@ -282,6 +240,7 @@ def generate_cff(GF1, GF2, k, old_k, steps):
 
         count_block = 0
         block_line = 0
+        count_gap_collumn = 0
         cff_new = []
         for combination in combinations_new:
             lines = []
@@ -293,12 +252,12 @@ def generate_cff(GF1, GF2, k, old_k, steps):
             count_collumn = 0
             block_column = 0
             _bool_lines = [False] * (totalBlocks_collumns)
-            count_gap = 0
+            count_gap_line = 0
 
             for poly in polynomials_new:
-                if (count_gap<gap_new_poly):
+                if (count_gap_line < gap_new_poly or count_gap_collumn < gap_new_comb):
                     lines.append(1 if poly(x) == y else 0)
-                    count_gap+=1
+                    count_gap_line+=1
                 else:
                     if dic_new_new[(block_line, block_column)][count_collumn] == 1:
                         lines.append(0)
@@ -322,11 +281,14 @@ def generate_cff(GF1, GF2, k, old_k, steps):
                         block_column += 1
                     else:
                         count_collumn += 1
-            if count_block == GF2.order-1:
-                count_block = 0 
-                block_line += 1
-            else: 
-                count_block += 1
+            if (count_gap_line>=gap_new_poly and count_gap_collumn>=gap_new_comb):
+                if count_block == GF2.order-1:
+                    count_block = 0 
+                    block_line += 1
+                else: 
+                    count_block += 1
+            
+            count_gap_collumn+=1
 
             cff_new.append(lines)
 
