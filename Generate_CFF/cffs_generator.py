@@ -198,49 +198,99 @@ def generate_cff(GF1, GF2, k, old_k, steps):
 
         gap_new_comb = GF1.order*(GF2.order-GF1.order)
         
-        totalPolynomials = 0
-        for i in range(k):
-            totalPolynomials += (GF1.order ** (k-1-i)) * (GF2.order-GF1.order) * (GF2.order**(i+1))
-        
-        totalBlocks_collumns = int(totalPolynomials/GF2.order)
-
+        totalBlocks_collumns = int(len(polynomials_new)/GF2.order)
         totalCombinations = int(((GF2.order-GF1.order)*GF2.order)/GF2.order)
         
         dic_new_new = {}
         for i in range(totalBlocks_collumns):
             for j in range(totalCombinations):
                 dic_new_new[(j, i)] = [0] * (GF2.order)
+
+        gap_new_old = GF1.order * (GF2.order-GF1.order)
+        totalCombinations = (GF2.order - GF1.order)
+
+        dic_new_old = {}
+        for i in range(1):
+            for j in range(totalCombinations):
+                dic_new_old[(j, i)] = [0] * (GF2.order)
         
+
         cff_old_new = []
         for combination in combinations_old:
             lines = []
+            
+
+            _bool_lines = [False] * int((len(polynomials_new)-gap_new_poly)/GF2.order)
+            block_column = 0
+            count_collumn = 0
+            count_gap_collumn = 0
 
             x, y = combination
             x = GF2(x) 
             y = GF2(y)
             
             for poly in polynomials_new:
-                lines.append(1 if poly(x) == y else 0)
+                if count_gap_collumn >= gap_new_poly:
+                    if _bool_lines[block_column] == True:
+                        lines.append(0)
+                    elif count_collumn == GF2.order-1 and _bool_lines[block_column] == False:
+                        lines.append(1)
+                        _bool_lines[block_column] = True   
+                    else:
+                        evaluate = 1 if poly(x) == y else 0
+                        lines.append(evaluate)       
+                        if evaluate == 1:
+                            _bool_lines[block_column] = True 
+
+                    if count_collumn == GF2.order-1:
+                        count_collumn = 0
+                        block_column += 1
+                    else:
+                        count_collumn += 1           
+                else:
+                        lines.append(1 if poly(x) == y else 0) 
+                        count_gap_collumn+=1
 
             cff_old_new.append(lines)
-            
-
+        
+        count_block = 0
+        block_line = 0
+        block_column = 0
+        count_new_old = 0
         cff_new_old = []
         for combination in combinations_new:
             lines = []
+            x, y = combination
+            count_collumn = 0
             for poly_GF2 in polynomials_old:
-                x, y = combination
-                if int(x) in [int(e) for e in GF1.elements] and int(y) not in [int(e) for e in GF1.elements]:
+                if count_new_old < gap_new_old:
                     lines.append(0)
                 else:
-                    x = GF2(x) 
-                    y = GF2(y)
-                    lines.append(1 if poly_GF2(x) == y else 0)
+                    if dic_new_old[(block_line, block_column)][count_collumn] == 1:
+                        lines.append(0)
+                    elif dic_new_new[(block_line, block_column)][count_collumn] == 0 and count_block == GF2.order-1:
+                        lines.append(1)
+                    else:
+                        x = GF2(x) 
+                        y = GF2(y)
+                        lines.append(1 if poly_GF2(x) == y else 0)
+
+                    count_collumn += 1
+                count_block += 1
+
+            if count_block == GF2.order-1:
+                count_block = 0
+                block_line += 1
+            else:
+                count_block += 1
+
+            count_new_old += 1
+
             cff_new_old.append(lines)
 
         count_block = 0
         block_line = 0
-        count_gap_collumn = 0
+        count_gap_line = 0
         cff_new = []
         for combination in combinations_new:
             lines = []
@@ -249,46 +299,75 @@ def generate_cff(GF1, GF2, k, old_k, steps):
             x = GF2(x) 
             y = GF2(y)
 
+            _bool_lines = [False] * int((len(polynomials_new)-gap_new_poly)/GF2.order)
             count_collumn = 0
             block_column = 0
-            _bool_lines = [False] * (totalBlocks_collumns)
-            count_gap_line = 0
+            count_gap_collumn = 0
 
             for poly in polynomials_new:
-                if (count_gap_line < gap_new_poly or count_gap_collumn < gap_new_comb):
-                    lines.append(1 if poly(x) == y else 0)
-                    count_gap_line+=1
-                else:
-                    if dic_new_new[(block_line, block_column)][count_collumn] == 1:
-                        lines.append(0)
-                    elif _bool_lines[block_column] == True:
-                        lines.append(0)
-                    elif count_collumn == GF2.order-1 and _bool_lines[block_column] == False:
-                        lines.append(1)
-                        _bool_lines[block_column] = True
-                    elif dic_new_new[(block_line, block_column)][count_collumn] == 0 and count_block == GF2.order-1:
-                        lines.append(1)
-                        _bool_lines[block_column] = True
+                if count_gap_line < gap_new_comb:
+                    if count_gap_collumn >= gap_new_poly:
+                        if _bool_lines[block_column] == True:
+                            lines.append(0)
+                        elif count_collumn == GF2.order-1 and _bool_lines[block_column] == False:
+                            lines.append(1)
+                            _bool_lines[block_column] = True   
+                        else:
+                            evaluate = 1 if poly(x) == y else 0
+                            lines.append(evaluate)       
+                            if evaluate == 1:
+                                _bool_lines[block_column] = True 
+
+                        if count_collumn == GF2.order-1:
+                            count_collumn = 0
+                            block_column += 1
+                        else:
+                            count_collumn += 1 
                     else:
-                        evaluate = 1 if poly(x) == y else 0
-                        lines.append(evaluate)
-                        if evaluate == 1:
-                            dic_new_new[(block_line, block_column)][count_collumn] += 1
+                        lines.append(1 if poly(x) == y else 0)
+                        count_gap_collumn += 1
+                else:
+                    if count_gap_collumn < gap_new_poly:
+                        if dic_new_new[(block_line, block_column)][count_collumn] == 1:
+                            lines.append(0)
+                        elif dic_new_new[(block_line, block_column)][count_collumn] == 0 and count_block == GF2.order-1:
+                            lines.append(1)
+                        else:
+                            evaluate = 1 if poly(x) == y else 0
+                            lines.append(evaluate)
+                            if evaluate == 1:
+                                dic_new_new[(block_line, block_column)][count_collumn] += 1
+                    else: 
+                        if dic_new_new[(block_line, block_column)][count_collumn] == 1:
+                            lines.append(0)
+                        elif _bool_lines[block_column] == True:
+                            lines.append(0)
+                        elif count_collumn == GF2.order-1 and _bool_lines[block_column] == False:
+                            lines.append(1)
                             _bool_lines[block_column] = True
+                        elif dic_new_new[(block_line, block_column)][count_collumn] == 0 and count_block == GF2.order-1:
+                            lines.append(1)
+                            _bool_lines[block_column] = True
+                        else:
+                            evaluate = 1 if poly(x) == y else 0
+                            lines.append(evaluate)
+                            if evaluate == 1:
+                                dic_new_new[(block_line, block_column)][count_collumn] += 1
+                                _bool_lines[block_column] = True
 
                     if count_collumn == GF2.order-1:
                         count_collumn = 0
                         block_column += 1
                     else:
                         count_collumn += 1
-            if (count_gap_line>=gap_new_poly and count_gap_collumn>=gap_new_comb):
+            if (count_gap_line>=gap_new_comb):
                 if count_block == GF2.order-1:
                     count_block = 0 
                     block_line += 1
                 else: 
                     count_block += 1
             
-            count_gap_collumn+=1
+            count_gap_line+=1
 
             cff_new.append(lines)
 
