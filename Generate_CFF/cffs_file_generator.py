@@ -98,7 +98,7 @@ def determine_folder():
     """Determines the directory where the growth CFF files will be stored."""
     script_dir = os.path.dirname(os.path.abspath(__file__))
     parent_dir = os.path.dirname(script_dir)
-    folder = os.path.join(parent_dir, 'Cffs_samples_growth')
+    folder = os.path.join(parent_dir, 'growth_cffs_test')
     return folder
 
 def generate_file(GF1, GF2, k, old_k, steps, data_list, matrix_parts=None):
@@ -139,5 +139,7 @@ def grow_matrix(GF1, GF2, k, old_k):
         matrix_parts = generate_cff(GF1, GF2, k, old_k, steps)
         generate_file(GF1, GF2, k, old_k, steps, None, matrix_parts=matrix_parts)
 
-#create_matrix(2,1)
+create_matrix(2,1)
 grow_matrix(2,4,1,1)
+grow_matrix(4,16,1,1)
+grow_matrix(4,16,2,1)
