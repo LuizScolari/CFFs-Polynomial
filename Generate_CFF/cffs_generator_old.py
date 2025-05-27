@@ -135,7 +135,7 @@ def generate_combinations(GF1, GF2, k, steps):
 
         return combinations_old, combinations_new
 
-def generate_cff(GF1, GF2, k, old_k, steps):
+def generate_cff_old(GF1, GF2, k, old_k, steps):
     """Evaluates polynomials based on the given finite fields and parameters."""
     if GF2 == None and old_k == None:
         polynomials = generate_polynomials(GF1, GF2, k, old_k, None)
@@ -143,10 +143,10 @@ def generate_cff(GF1, GF2, k, old_k, steps):
 
         cff = []
         for combination in combinations:
-            lines = []          
+            lines = []  
+            x, y = combination          
             for poly in polynomials:
                 lines.append(1 if poly(x) == y else 0)
-
             cff.append(lines)
         return cff
     
