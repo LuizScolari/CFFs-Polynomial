@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Carregar os arquivos (ajuste os caminhos se necessário)
+# Carregar os arquivos
 df_new = pd.read_excel("cff_test_results.xlsx")
 df_old = pd.read_excel("cff_test_results_old.xlsx")
 
@@ -9,14 +9,18 @@ df_old = pd.read_excel("cff_test_results_old.xlsx")
 grow_new = df_new[df_new["Test Type"] == "Grow CFF"]
 grow_old = df_old[df_old["Test Type"] == "Grow CFF"]
 
+# Filtrar valores de k ANTES do agrupamento
+grow_new = grow_new[grow_new["k"].astype(float).isin([1.0, 2.0])]
+grow_old = grow_old[grow_old["k"].astype(float).isin([1.0, 2.0])]
+
 # Agrupar por (GF(p^n), k) e calcular a média dos tempos
 grouped_new = grow_new.groupby(["GF(p^n)", "k"])["Execution Time (s)"].mean().reset_index()
 grouped_old = grow_old.groupby(["GF(p^n)", "k"])["Execution Time (s)"].mean().reset_index()
 
-# Combinar os dois dataframes para comparação
+# Combinar os dois dataframes
 comparison = pd.merge(grouped_new, grouped_old, on=["GF(p^n)", "k"], suffixes=('_new', '_old'))
 
-# Plotar gráfico comparativo
+# Plotar gráfico
 plt.figure(figsize=(12, 6))
 for gf in sorted(comparison["GF(p^n)"].unique()):
     subset = comparison[comparison["GF(p^n)"] == gf]
@@ -28,5 +32,9 @@ plt.xlabel("k")
 plt.ylabel("Tempo de Execução (s)")
 plt.legend()
 plt.grid(True)
+
+# Forçar apenas os ticks desejados no eixo x
+plt.xticks([1.0, 2.0])
+
 plt.tight_layout()
 plt.show()
