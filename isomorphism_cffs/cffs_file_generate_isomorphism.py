@@ -55,7 +55,7 @@ def determine_folder():
     """Determines the directory where the growth CFF files will be stored."""
     script_dir = os.path.dirname(os.path.abspath(__file__))
     parent_dir = os.path.dirname(script_dir)
-    folder = os.path.join(parent_dir, 'isomorphic_cffs')
+    folder = os.path.join(parent_dir, 'isomorphism_cffs')
     return folder
 
 def generate_file(GF2, k, steps, data_list):
@@ -74,11 +74,11 @@ def create_matrix(GF1, GF2, k, old_k):
     GF2 = galois.GF(GF2)
     GF2.repr('poly')
 
-    steps = [(2,1),(4,1),(16,1)]
+    steps = [(4,2),(16,2)]
     condition = validate_condition(GF1, None, k, None)
     if condition:
         matrix = generate_cff(GF1, GF2, k, old_k, steps)
         generate_file(GF2, k, steps, matrix)
 
 
-create_matrix(4,16,1,1)
+create_matrix(4,16,2,2)
