@@ -225,21 +225,23 @@ def generate_cff(GF1, GF2, k, old_k, steps):
         gap_new_comb = GF1.order*(GF2.order-GF1.order)
         
         # Cáculo da quantidade de blocos por coluna nas combinações novas e polinômios novos
-        totalBlocks_collumns = int(len(polynomials_new)/GF2.order)
+        totalBlocks_collumns_new = int(len(polynomials_new)/GF2.order)
         # Cáculo da quantidade de blocos por linha nas combinações novas e polinômios novos
         totalCombinations_new_new = int(((GF2.order-GF1.order)*GF2.order)/GF2.order)
+        # Cáculo da quantidade de blocos por coluna nas combinações novas e polinômios antigos
+        totalBlocks_collumns_old = int(len(polynomials_old)/GF2.order)
         # Cáculo da quantidade de blocos por linha nas combinações novas e polinômios antigos
         totalCombinations_new_old = (GF2.order - GF1.order)
         
         # Dicionário para verificar se a coluna do bloco já possui 1, polinômios novos com combinações novas
         dic_new_new = {}
-        for i in range(totalBlocks_collumns):
+        for i in range(totalBlocks_collumns_new):
             for j in range(totalCombinations_new_new):
                 dic_new_new[(j, i)] = [0] * (GF2.order)
 
         # Dicionário para verificar se a coluna do bloco já possui 1, polinômios novos com combinações novas
         dic_new_old = {}
-        for i in range(1):
+        for i in range(totalBlocks_collumns_old):
             for j in range(totalCombinations_new_old):
                 dic_new_old[(j, i)] = [0] * (GF2.order)
         
@@ -301,8 +303,6 @@ def generate_cff(GF1, GF2, k, old_k, steps):
         count_line = 0
         # variável que define em qual bloco está pelas linhas
         block_line = 0
-        # variável de define em qual bloco está pelas colunas, só existe uma coluna de blocos, será sempre 0
-        block_column = 0
         # variável que define o gap das combinações
         count_gap_line = 0
 
@@ -311,14 +311,16 @@ def generate_cff(GF1, GF2, k, old_k, steps):
         for combination in combinations_new:
             lines = []
 
-            # variável que define em qual coluna do bloco está
+            # variável que orienta o fim de um bloco pelas colunas
             count_collumn = 0
+            # váriavel que define em qual bloco está pelas colunas
+            block_column = 0
 
             x, y = combination
             x = GF2(x) 
             y = GF2(y)
 
-            for poly_GF2 in polynomials_old:
+            for poly in polynomials_old:
                 
                 # se o count_gap < gap, adiciona 0, está avaliando um pol. ant. com um elem. ant. e esperando um novo
                 if count_gap_line < gap_new_comb:
@@ -330,12 +332,24 @@ def generate_cff(GF1, GF2, k, old_k, steps):
                     #se estou na última linha, a coluna que estiver sem nenhum 1, adiciono 1
                     elif dic_new_old[(block_line, block_column)][count_collumn] == 0 and count_line == GF2.order-1:
                         lines.append(1)
+                        dic_new_old[(block_line, block_column)][count_collumn] += 1
                     #caso nenhum dos casos ocorreram, avalio o polinômio
                     else:
-                        lines.append(1 if poly_GF2(x) == y else 0)
+                        # avaliação do polinômio
+                        evaluate = 1 if poly(x) == y else 0
+                        lines.append(evaluate)
+                        if evaluate == 1:
+                            # define 1 na coluna do bloco
+                            dic_new_old[(block_line, block_column)][count_collumn] += 1
                     
-                    # passa para a próxima coluna do bloco
-                    count_collumn += 1
+                    # caso esteja na última coluna do bloco, passa para a coluna do próximo bloco
+                    if count_collumn == GF2.order-1:
+                        count_collumn = 0
+                        block_column += 1
+                    # move para a próxima coluna do bloco
+                    else:
+                        count_collumn += 1
+
                 # passa para a próxima linha do bloco
                 count_line += 1
 
@@ -424,6 +438,7 @@ def generate_cff(GF1, GF2, k, old_k, steps):
                         #se estou na última linha, a coluna que estiver sem nenhum 1, adiciono 1
                         elif dic_new_new[(block_line, block_column)][count_collumn] == 0 and count_line == GF2.order-1:
                             lines.append(1)
+                            dic_new_new[(block_line, block_column)][count_collumn] += 1
                         # caso nenhum dos casos ocorreram, avalio o polinômio
                         else:
                             # avaliação do polinômio
