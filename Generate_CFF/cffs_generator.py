@@ -350,16 +350,14 @@ def generate_cff(GF1, GF2, k, old_k, steps):
                     else:
                         count_collumn += 1
 
-                # passa para a próxima linha do bloco
-                count_line += 1
-
-            # se estou na úttima linha do bloco, passo para a linha do próximo bloco
-            if count_line == GF2.order-1:
-                count_line = 0
-                block_line += 1
-            # move para a próxima linha do bloco
-            else:
-                count_line += 1
+            if count_gap_line >= gap_new_comb:
+                # se estou na úttima linha do bloco, passo para a linha do próximo bloco
+                if count_line == GF2.order-1:
+                    count_line = 0
+                    block_line += 1
+                # move para a próxima linha do bloco
+                else:
+                    count_line += 1
 
             # se count_gap < gap, acrescenta +1 em count_gap
             if count_gap_line < gap_new_comb:
