@@ -1,4 +1,5 @@
-from cffs_generator import generate_cff
+from src.cffs_generator import generate_cff_final
+
 import os
 import galois
 
@@ -98,7 +99,7 @@ def determine_folder():
     """Determines the directory where the growth CFF files will be stored."""
     script_dir = os.path.dirname(os.path.abspath(__file__))
     parent_dir = os.path.dirname(script_dir)
-    folder = os.path.join(parent_dir, 'growth_cffs_test')
+    folder = os.path.join(parent_dir, 'new_test')
     return folder
 
 def generate_file(GF1, GF2, k, old_k, steps, data_list, matrix_parts=None):
@@ -121,7 +122,7 @@ def create_matrix(GF1, k):
     steps = [(GF1.order, k)]
     condition = validate_condition(GF1, None, k, None)
     if condition:
-        matrix = generate_cff(GF1, None, k, None, None)
+        matrix = generate_cff_final(GF1, None, k, None, None)
         generate_file(GF1, None, k, None, steps, matrix)
 
 def grow_matrix(GF1, GF2, k, old_k):
@@ -136,10 +137,19 @@ def grow_matrix(GF1, GF2, k, old_k):
 
     condition = validate_condition(GF1, GF2, k, old_k)
     if condition:
-        matrix_parts = generate_cff(GF1, GF2, k, old_k, steps)
+        matrix_parts = generate_cff_final(GF1, GF2, k, old_k, steps)
         generate_file(GF1, GF2, k, old_k, steps, None, matrix_parts=matrix_parts)
 
-create_matrix(2,1)
-grow_matrix(2,4,1,1)
-grow_matrix(4,16,1,1)
-grow_matrix(4,16,2,1)
+cff = create_matrix(2,1)
+cff = grow_matrix(2,8,1,1)
+#cff_grow = grow_matrix(3,9,1,1)
+
+
+# import time
+# ini = time.time()
+# create_matrix(5,1)
+# grow_matrix(5,5,2,1)
+# grow_matrix(5,5,3,2)
+# grow_matrix(5,25,1,1)
+# end = time.time()
+# print(end-ini)
