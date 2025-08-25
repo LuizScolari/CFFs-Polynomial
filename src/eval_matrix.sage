@@ -13,6 +13,7 @@ def generate_polynomials(Fields_ring, k_steps):
                 polys = list(P.polynomials(max_degree=k_steps[0]))
                 for p in polys:
                     old_polynomials.append(K(p))
+
             elif i != len(Fields_ring)-1:   
                 P = Fields_ring[i]
                 K = Fields_ring[len(Fields_ring)-1]
@@ -31,7 +32,9 @@ def generate_polynomials(Fields_ring, k_steps):
 
 def generate_elements(K, Fq_steps):
     if len(Fq_steps) == 1:
-        return K.list()
+        el = list(K.list())
+        combos = [(x, y) for x in el for y in el]
+        return combos, el
         
     else:
         combos_old = []
@@ -149,16 +152,23 @@ def generate_cff(Fq_steps, k_steps):
         K.<a> = GF(q)
         P.<y> = PolynomialRing(K)
 
-        el    = list(generate_elements(K, Fq_steps))
+        combos, el = list(generate_elements(K, Fq_steps))
         polys = list(generate_polynomials([P], k_steps))
 
-        M = Matrix(K, [
-            [1 if g(x) == y else 0 for g in polys]   # linha para um (x,y)
-            for x in el
-            for y in el
-        ])
+        # mapeia elemento -> índice da linha
+        idx = { e:i for i, e in enumerate(el) }  
 
-        return M
+        # Matriz de avaliações: |el| x |polys|
+        # evals[i,j] = polys[j](el[i])
+        evals = matrix(K, [[ p(x) for p in polys ] for x in el])
+
+        cff = []
+        for x, y in combos:
+            i = idx[x]
+            row = [K(evals[i,j] == y) for j in range(evals.ncols())]
+            cff.append(row)
+        return cff
+
     else:
         p = Fq_steps[0]
         
@@ -171,78 +181,29 @@ def generate_cff(Fq_steps, k_steps):
         combos_old, combos_new   = generate_elements(fields[len(fields)-1], Fq_steps)
 
         new_poly, old_poly = generate_polynomials(poly_rings, k_steps)
-        
+
         K = fields[len(fields)-1]
-        M1 = Matrix(K, [[ 1 if g(x) == y else 0 for g in old_poly] for x,y in combos_new])
-        M2 = Matrix(K, [[ 1 if g(x) == y else 0 for g in new_poly] for x,y in combos_old])
-        M3 = Matrix(K, [[ 1 if g(x) == y else 0 for g in new_poly] for x,y in combos_new])
+        el = list(K.list())
+        idx = { e:i for i, e in enumerate(el) } 
+        evals_old = matrix(K, [[ p(x) for p in old_poly ] for x in el])
+        evals_new = matrix(K, [[ p(x) for p in new_poly ] for x in el])
 
-        """
-        for row in M1.rows(): print(row)
-        for row in M2.rows(): print(row)
-        for row in M3.rows(): print(row)
-        """
+        cff_old_new = []
+        for x, y in combos_old:
+            i = idx[x]
+            row = [K(evals_new[i,j] == y) for j in range(evals_new.ncols())]
+            cff_old_new.append(row)
 
-        return M1, M2, M3
+        cff_new_old = []
+        for x, y in combos_new:
+            i = idx[x]
+            row = [K(evals_old[i,j] == y) for j in range(evals_old.ncols())]
+            cff_new_old.append(row)
 
-#generate_cff([2,4], [1,1])
-#generate_cff([2,4,16], [1,1,1])
+        cff_new = []
+        for x, y in combos_new:
+            i = idx[x]
+            row = [K(evals_new[i,j] == y) for j in range(evals_new.ncols())]
+            cff_new.append(row)
 
-# cd "/Users/luizscolari/Documents/GitHub Projects/CFFs-Polynomial/src" && sage "eval_matrix.sage"
-
-"""
-# Exemplo da sua construção
-F2.<a0> = GF(2)
-
-# Passo 1: F4 sobre F2, usando polinômio em y
-P.<y> = PolynomialRing(F2)
-f = y^2 + y + 1                  # irreduzível em F2[y]
-F4.<a1> = F2.extension(f)
-
-# Passo 2: F16 sobre F4, polinômio em z com coeficientes em F4
-Q.<z> = PolynomialRing(F4)
-print(Q)
-
-g = z^2 + z + a1  # um exemplo (irredutível em F4[z])
-K.<a2> = F4.extension(g)
-L.<a3> = PolynomialRing(K)
-
-p0 = list(P.polynomials(max_degree=1))
-p1 = list(Q.polynomials(max_degree=1))
-p2 = list(L.polynomials(max_degree=1))
-
-# Polinômios de F2 com grau <= 1: [0, 1, x, x+1]
-polys_F2 = list(P.polynomials(max_degree=1))
-print(polys_F2)             # [0, 1, x, x + 1]
-
-# Converter para F4[z] (mesma forma, coeficientes agora em F4)
-polys_in_F4 = [Q(p) for p in polys_F2]            # ou p.change_ring(F4)
-print(polys_in_F4)          # [0, 1, z, z + 1]
-
-# Converter para F16[w]
-polys_in_F16 = [L(p) for p in polys_F2]           # ou p.change_ring(K)
-print(polys_in_F16)         # [0, 1, w, w + 1]
-
-F_sets, only = partition_by_all_subfields(K, [2,4,16])
-"""
-
-
-"""
-def partition_subfields(K):
-    p = K.characteristic()              # 2
-    # conjuntos em K (todos tipados como elementos de K)
-    F2_in_K = {x for x in K if x**(p)     == x}   # fixos pelo Frobenius^1
-    F4_in_K = {x for x in K if x**(p**2)  == x}   # fixos pelo Frobenius^2
-
-    only_F2   = F2_in_K                              # {0,1}
-    only_F4   = F4_in_K - F2_in_K                    # elementos de F4 que não estão em F2
-    only_F16  = set(K) - F4_in_K                     # o restante (novos em F16)
-
-    return only_F2, only_F4, only_F16
-
-only_F2, only_F4, only_F16 = partition_subfields(K)
-print(len(only_F2), len(only_F4), len(only_F16))   # esperado: 2, 2, 12
-print(only_F2)
-print(only_F4)
-print(only_F16)
-"""
+        return cff_old_new, cff_new_old, cff_new
