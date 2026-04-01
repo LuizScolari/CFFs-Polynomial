@@ -1,14 +1,12 @@
-# Polynomial-Construction-CFFs
+# CFFs-from-Polynomials-over-Finite-Fields
 
 ## 📌 Overview
 CFFs (Cover-Free Families) are combinatorial structures used in cryptography, coding theory, and group testing. These structures consist of collections of *d* subsets where no subset is entirely covered by the union of others.
 
-The **polynomial construction** to CFFs involves constructing these families using polynomials over finite fields, which helps optimize their size and efficiency for practical applications.
+The construction of Cover-Free Families (CFFs) used in this project is based on polynomials over finite fields.
 
 ## 📚 About this Project
-The study of combinatorial designs explores ways to arrange elements of a finite set into subsets that satisfy specific balance properties. These designs have applications in multiple fields, including:
-- **Software Engineering** (e.g., test case selection)
-- **Cryptography** (e.g., key distribution, digital signatures)
+The study of combinatorial designs explores ways to arrange elements of a finite set into subsets that satisfy specific balance properties. These designs have applications in multiple fields.
 
 This project aims to:
 - Develop new combinatorial designs
@@ -32,17 +30,15 @@ CFFs are utilized in various areas, such as:
 ## ▶️ Small Examples of CFFs
 Below are some simple examples of CFFs represented as matrices:
 
-### **Example 1: A 1-CFF(4,4)**
-A 1-CFF(4,4) means that, for any block (or column), no block is entirely covered by the other blocks.
+### **Example 1: A 1-CFF(4,6)**
+A 1-CFF(4,6) means that, for any block (or column), no block is entirely covered by the other blocks.
 
 ```
-  1 1 0 0
-  1 0 1 0
-  0 1 0 1
-  0 0 1 1
+  1 1 1 0 0 0
+  1 0 0 1 1 0
+  0 1 0 1 0 1
+  0 0 1 0 1 1
 ```
-- Each column represents a subset.
-- The structure ensures that no subset is fully contained within others.
 
 ### **Example 2: A Polynomial-Based CFF over $\mathbb{F}_2$**
 A polynomial-based construction of a 1-CFF(4,4) using elements from GF(2):
@@ -61,12 +57,9 @@ Let $\mathbb{F}_2$ = {0,1} with k = 1, where k represents the maximum degree of 
 
 ## 🚀 Future Work
 This project is under continuous development, and upcoming improvements include:
-- More efficient polynomial constructions
+- More efficient constructions
 - Larger dataset experiments
 - Real-world cryptographic applications
-
-## 🤝 Contributing
-Contributions are welcome! Feel free to open issues or submit pull requests.
 
 ## 📜 License
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/LuizScolari/CFFs-Polynomial/blob/main/LICENSE) file for details.
